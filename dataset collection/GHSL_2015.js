@@ -18,7 +18,7 @@ Export.image.toDrive({
   folder: 'Dataset_PS1',
   fileNamePrefix: 'ghsl_uttarakhand_built2015',
   region: uttarakhand.geometry(),
-  scale: 100,
+  scale: 30, //resampled to 30m
   crs: 'EPSG:4326',
   maxPixels: 1e13
 });

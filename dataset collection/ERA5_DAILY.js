@@ -42,7 +42,7 @@ ee.List.sequence(0, nDays.subtract(1)).getInfo().forEach(function(dayOffset) {
       folder: 'GEE_Exports',
       fileNamePrefix: 'era5_' + dateStr,
       region: uttarakhand.geometry(),
-      scale: 10000,
+      scale: 30, //resampled to 30m
       crs: 'EPSG:4326',
       maxPixels: 1e13
     });

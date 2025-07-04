@@ -2,24 +2,28 @@ import numpy as np
 
 def normalize_patch(patch):
     """
-    Normalizes input 9-band patch (excluding label).
-    - Assumes patch shape = (H, W, 9)
-    - Normalize each band to [0, 1] range
+    Robust per-band normalization for a 9‑band input patch.
+    Cleans NaNs/Infs and scales each band to [0, 1].
+    Input shape: (H, W, 9)
     """
-    patch = np.clip(patch, 0, 1)  # assuming values are already scaled
-    return patch
+    # Prepare output array
+    norm_patch = np.zeros_like(patch, dtype=np.float32)
 
-def compute_class_weight(mask_batch):
-    """
-    Dynamically compute foreground/background weights
-    from batch of masks (batch_size, H, W, 1)
-    Returns a per-sample weight map
-    """
-    weights = []
-    for mask in mask_batch:
-        pos = np.sum(mask == 1)
-        neg = np.sum(mask == 0)
-        total = pos + neg
-        w = np.where(mask == 1, total / (2. * pos + 1e-6), total / (2. * neg + 1e-6))
-        weights.append(w)
-    return np.stack(weights, axis=0)
+    for b in range(patch.shape[-1]):
+        band = patch[:, :, b].astype(np.float32)
+
+        # 1) Clean up any NaN or infinite values
+        band = np.nan_to_num(band, nan=0.0, posinf=0.0, neginf=0.0)
+
+        # 2) Compute min/max
+        b_min = np.min(band)
+        b_max = np.max(band)
+
+        # 3) Safe normalization (avoid divide-by-zero)
+        if b_max > b_min:
+            norm_patch[:, :, b] = (band - b_min) / (b_max - b_min)
+        else:
+            # constant band or empty → fill with zeros
+            norm_patch[:, :, b] = 0.0
+
+    return norm_patch

@@ -63,7 +63,7 @@ class FireDatasetGenerator(Sequence):
             mask = np.expand_dims(mask, -1)
 
             # 🔥 Try to sample fire patches
-            if np.std(img) < 1e-5 or np.sum(mask) < 10:
+            if np.std(img) < 1e-5 or np.sum(mask) < 2:
                 continue
 
             if self.augment_fn:

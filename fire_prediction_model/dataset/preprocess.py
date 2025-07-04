@@ -2,21 +2,21 @@ import numpy as np
 
 def normalize_patch(patch):
     """
-    Normalizes input 9-band patch (excluding label).
-    - Input shape: (H, W, 9)
-    - Output shape: same, with each band normalized to [0, 1]
+    Normalizes 9-band patch to [0, 1] with per-band scaling.
+    - Handles NaNs, infs, and constant bands safely
     """
-    patch = np.nan_to_num(patch)  # Replace NaNs/Infs with 0
-    norm_patch = np.zeros_like(patch)
+    patch = np.nan_to_num(patch, nan=0.0, posinf=0.0, neginf=0.0)  # Clean any NaNs/Infs
+    norm_patch = np.zeros_like(patch, dtype=np.float32)
 
     for b in range(patch.shape[-1]):
         band = patch[:, :, b]
-        band_min = np.nanmin(band)
-        band_max = np.nanmax(band)
-        if band_max > band_min:
-            norm_patch[:, :, b] = (band - band_min) / (band_max - band_min)
+        b_min = np.min(band)
+        b_max = np.max(band)
+
+        if b_max > b_min:
+            norm_patch[:, :, b] = (band - b_min) / (b_max - b_min)
         else:
-            norm_patch[:, :, b] = 0  # or 0.5 if you want neutral input
+            norm_patch[:, :, b] = 0.0  # constant band → fill with 0
 
     return norm_patch
 

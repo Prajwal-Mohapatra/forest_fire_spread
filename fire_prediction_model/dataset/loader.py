@@ -37,16 +37,20 @@ class FireDatasetGenerator(Sequence):
         X, Y = [], []
         for tif_path, x, y in batch_samples:
             with rasterio.open(tif_path) as src:
-                patch = src.read(window=rasterio.windows.Window(x, y, self.patch_size, self.patch_size))
+                window = rasterio.windows.Window(x, y, self.patch_size, self.patch_size)
+
+                # Safe read with boundary handling + fill for missing values
+                patch = src.read(window=window, boundless=True, fill_value=0).astype('float32')
+
+                # Remove NaN/inf before any processing
+                patch = np.nan_to_num(patch, nan=0.0, posinf=0.0, neginf=0.0)
+
                 patch = np.moveaxis(patch, 0, -1)  # (H, W, C)
 
-            # Clean NaNs/Infs before normalization
-            patch = np.nan_to_num(patch, nan=0.0, posinf=0.0, neginf=0.0)
+            # Normalize image bands (first 9)
+            img = normalize_patch(patch[:, :, :9])
 
-            # Normalize image bands (first 9 channels)
-            img = normalize_patch(patch[:, :, :9].astype('float32'))
-
-            # Prepare binary mask from 10th band
+            # Prepare binary fire mask from 10th band
             mask = (patch[:, :, 9] > 0).astype('float32')
             mask = np.expand_dims(mask, axis=-1)
 

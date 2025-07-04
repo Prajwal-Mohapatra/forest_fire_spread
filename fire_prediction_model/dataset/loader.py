@@ -35,7 +35,7 @@ class FireDatasetGenerator(Sequence):
     X, Y = [], []
     i = idx * self.batch_size
     retries = 0
-    max_retries = 100
+    max_retries = 1000
 
     while len(X) < self.batch_size and retries < max_retries:
         tif_path, x, y = self.samples[i % len(self.samples)]

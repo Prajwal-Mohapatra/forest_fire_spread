@@ -9,8 +9,8 @@ from dataset.preprocess import normalize_patch
 class FireDatasetGenerator(Sequence):
     def __init__(self, tif_paths, patch_size=256, batch_size=8, n_patches_per_img=50,
                  shuffle=True, augment_fn=None, **kwargs):
-        super()._init_(**kwargs)
-        
+        super().__init__(**kwargs)
+
         self.tif_paths = tif_paths
         self.patch_size = patch_size
         self.batch_size = batch_size

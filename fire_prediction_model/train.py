@@ -28,8 +28,8 @@ val_files = sorted(glob.glob(os.path.join(base_dir, 'stack_2016_05_0[1-7]*.tif')
 test_files = sorted(glob.glob(os.path.join(base_dir, 'stack_2016_05_2[3-9]*.tif')))
 
 # ====== Data Generators ======
-train_gen = FireDatasetGenerator(train_files, batch_size=8, n_patches_per_img=60)
-val_gen = FireDatasetGenerator(val_files, batch_size=8, n_patches_per_img=20)
+train_gen = FireDatasetGenerator(train_files, batch_size=8, n_patches_per_img=20)
+val_gen = FireDatasetGenerator(val_files, batch_size=8, n_patches_per_img=15)
 
 # ====== Estimate class weights ======
 print("Estimating fire/no-fire class balance...")

@@ -32,7 +32,7 @@ train_gen = FireDatasetGenerator(train_files, batch_size=8, n_patches_per_img=60
 val_gen = FireDatasetGenerator(val_files, batch_size=8, n_patches_per_img=20)
 
 # ====== Estimate class weights ======
-print("🔍 Estimating fire/no-fire class balance...")
+print("Estimating fire/no-fire class balance...")
 pos, neg = 0, 0
 for i in range(5):  # sample first 5 batches
     _, masks = train_gen[i]

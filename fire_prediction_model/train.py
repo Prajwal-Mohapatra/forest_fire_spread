@@ -29,7 +29,7 @@ class GPUMemoryLogger(tf.keras.callbacks.Callback):
                 pass
 
 # ====== Paths ======
-base_dir = '/home/swayam/projects/forest_fire_spread/fire-probability-prediction-map-unstacked-data/dataset_stacked'
+base_dir = '/kaggle/input/stacked-fire-probability-prediction-dataset/dataset_stacked'
 train_files = sorted(glob.glob(os.path.join(base_dir, 'stack_2016_04_*.tif')))
 val_files = sorted(glob.glob(os.path.join(base_dir, 'stack_2016_05_0[1-7]*.tif')))
 test_files = sorted(glob.glob(os.path.join(base_dir, 'stack_2016_05_2[3-9]*.tif')))

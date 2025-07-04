@@ -4,7 +4,6 @@ import rasterio
 from tensorflow.keras.utils import Sequence
 from sklearn.utils import shuffle
 import random
-from dataset.preprocess import normalize_patch  # ✅ Imported normalization
 
 class FireDatasetGenerator(Sequence):
     def __init__(self, tif_paths, patch_size=256, batch_size=8, n_patches_per_img=50,
@@ -16,7 +15,8 @@ class FireDatasetGenerator(Sequence):
         self.shuffle = shuffle
         self.augment_fn = augment_fn
         self.samples = self._generate_patch_coords()
-    
+        print(f"✅ Dataset loaded successfully! {len(self.samples)} patches available.")
+
     def _generate_patch_coords(self):
         all_samples = []
         for tif in self.tif_paths:
@@ -32,17 +32,28 @@ class FireDatasetGenerator(Sequence):
         return len(self.samples) // self.batch_size
 
     def __getitem__(self, idx):
-        batch_samples = self.samples[idx * self.batch_size:(idx + 1) * self.batch_size]
         X, Y = [], []
-        for tif_path, x, y in batch_samples:
-            with rasterio.open(tif_path) as src:
-                patch = src.read(window=rasterio.windows.Window(x, y, self.patch_size, self.patch_size))
-                patch = np.moveaxis(patch, 0, -1)  # (H, W, C)
+        count = 0
+        i = idx * self.batch_size
 
-            # ✅ Use normalize_patch instead of manual scaling
-            img = normalize_patch(patch[:, :, :9].astype('float32'))
+        while len(X) < self.batch_size and count < len(self.samples):
+            tif_path, x, y = self.samples[i % len(self.samples)]
+            count += 1
+            i += 1
+
+            with rasterio.open(tif_path) as src:
+                patch = src.read(window=rasterio.windows.Window(x, y, self.patch_size, self.patch_size),
+                                 boundless=True, fill_value=0).astype('float32')
+            patch = np.nan_to_num(patch, nan=0.0, posinf=0.0, neginf=0.0)
+            patch = np.moveaxis(patch, 0, -1)
+
+            img = patch[:, :, :9]
             mask = (patch[:, :, 9] > 0).astype('float32')
-            mask = np.expand_dims(mask, axis=-1)
+            mask = np.expand_dims(mask, -1)
+
+            # ✅ skip all-zero patches (or near-zero variance)
+            if np.std(img) < 1e-5 or np.all(mask == 0):
+                continue
 
             if self.augment_fn:
                 augmented = self.augment_fn(image=img, mask=mask)
@@ -50,4 +61,8 @@ class FireDatasetGenerator(Sequence):
 
             X.append(img)
             Y.append(mask)
+
+        if len(X) == 0:
+            raise RuntimeError("❌ All sampled patches were empty. Please check dataset or sampling logic.")
+
         return np.array(X), np.array(Y)

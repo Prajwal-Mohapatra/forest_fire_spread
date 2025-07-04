@@ -35,31 +35,37 @@ class FireDatasetGenerator(Sequence):
     def __getitem__(self, idx):
         batch_samples = self.samples[idx * self.batch_size:(idx + 1) * self.batch_size]
         X, Y = [], []
-        for tif_path, x, y in batch_samples:
+        for i, (tif_path, x, y) in enumerate(batch_samples):
             with rasterio.open(tif_path) as src:
                 window = rasterio.windows.Window(x, y, self.patch_size, self.patch_size)
 
-                # Safe read with boundary handling + fill for missing values
+                # Safe read with boundary handling
                 patch = src.read(window=window, boundless=True, fill_value=0).astype('float32')
 
-                # Remove NaN/inf before any processing
+                # Global cleanup
                 patch = np.nan_to_num(patch, nan=0.0, posinf=0.0, neginf=0.0)
 
                 patch = np.moveaxis(patch, 0, -1)  # (H, W, C)
 
-                print("Patch shape:", patch.shape)
-                print("Raw patch min/max:", np.nanmin(patch), np.nanmax(patch))
-                print("Any NaN in patch?", np.isnan(patch).any())
-
+                # 🔍 Print debug info for the first patch only
+                if idx == 0 and i == 0:
+                    print("📦 Raw patch debug:")
+                    print(" - shape:", patch.shape)
+                    print(" - dtype:", patch.dtype)
+                    print(" - global min:", np.nanmin(patch))
+                    print(" - global max:", np.nanmax(patch))
+                    print(" - any NaN:", np.isnan(patch).any())
+                    for b in range(patch.shape[-1]):
+                        band = patch[:, :, b]
+                        print(f"   Band {b+1:02} → min: {np.nanmin(band):.3f}, max: {np.nanmax(band):.3f}, NaN: {np.isnan(band).any()}")
 
             # Normalize image bands (first 9)
             img = normalize_patch(patch[:, :, :9])
 
-            # Prepare binary fire mask from 10th band
+            # Fire mask (band 10)
             mask = (patch[:, :, 9] > 0).astype('float32')
             mask = np.expand_dims(mask, axis=-1)
 
-            # Optional augmentation
             if self.augment_fn:
                 augmented = self.augment_fn(image=img, mask=mask)
                 img, mask = augmented['image'], augmented['mask']

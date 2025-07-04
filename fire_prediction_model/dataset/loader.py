@@ -47,9 +47,9 @@ class FireDatasetGenerator(Sequence):
 
                 patch = np.moveaxis(patch, 0, -1)  # (H, W, C)
 
-            print("Patch shape:", patch.shape)
-            print("Raw patch min/max:", np.nanmin(patch), np.nanmax(patch))
-            print("Any NaN in patch?", np.isnan(patch).any())
+                print("Patch shape:", patch.shape)
+                print("Raw patch min/max:", np.nanmin(patch), np.nanmax(patch))
+                print("Any NaN in patch?", np.isnan(patch).any())
 
 
             # Normalize image bands (first 9)

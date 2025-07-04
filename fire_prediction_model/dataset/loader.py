@@ -32,37 +32,38 @@ class FireDatasetGenerator(Sequence):
         return len(self.samples) // self.batch_size
 
     def __getitem__(self, idx):
-        X, Y = [], []
-        count = 0
-        i = idx * self.batch_size
+    X, Y = [], []
+    i = idx * self.batch_size
+    retries = 0
+    max_retries = 100
 
-        while len(X) < self.batch_size and count < len(self.samples):
-            tif_path, x, y = self.samples[i % len(self.samples)]
-            count += 1
-            i += 1
+    while len(X) < self.batch_size and retries < max_retries:
+        tif_path, x, y = self.samples[i % len(self.samples)]
+        i += 1
+        retries += 1
 
-            with rasterio.open(tif_path) as src:
-                patch = src.read(window=rasterio.windows.Window(x, y, self.patch_size, self.patch_size),
-                                 boundless=True, fill_value=0).astype('float32')
-            patch = np.nan_to_num(patch, nan=0.0, posinf=0.0, neginf=0.0)
-            patch = np.moveaxis(patch, 0, -1)
+        with rasterio.open(tif_path) as src:
+            patch = src.read(window=rasterio.windows.Window(x, y, self.patch_size, self.patch_size),
+                             boundless=True, fill_value=0).astype('float32')
+        patch = np.nan_to_num(patch, nan=0.0, posinf=0.0, neginf=0.0)
+        patch = np.moveaxis(patch, 0, -1)
 
-            img = patch[:, :, :9]
-            mask = (patch[:, :, 9] > 0).astype('float32')
-            mask = np.expand_dims(mask, -1)
+        img = patch[:, :, :9]
+        mask = (patch[:, :, 9] > 0).astype('float32')
+        mask = np.expand_dims(mask, -1)
 
-            # ✅ skip all-zero patches (or near-zero variance)
-            if np.std(img) < 1e-5 or np.all(mask == 0):
-                continue
+        if np.std(img) < 1e-5 or np.all(mask == 0):
+            continue  # Skip bad patch
 
-            if self.augment_fn:
-                augmented = self.augment_fn(image=img, mask=mask)
-                img, mask = augmented['image'], augmented['mask']
+        if self.augment_fn:
+            augmented = self.augment_fn(image=img, mask=mask)
+            img, mask = augmented['image'], augmented['mask']
 
-            X.append(img)
-            Y.append(mask)
+        X.append(img)
+        Y.append(mask)
 
-        if len(X) == 0:
-            raise RuntimeError("❌ All sampled patches were empty. Please check dataset or sampling logic.")
+    if len(X) == 0:
+        raise RuntimeError(f"❌ Failed to collect valid patches for batch {idx} after {max_retries} retries.")
 
-        return np.array(X), np.array(Y)
+    return np.array(X), np.array(Y)
+

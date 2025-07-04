@@ -2,25 +2,12 @@ import numpy as np
 
 def normalize_patch(patch):
     """
-    Normalizes 9-band input patch to [0,1] scale per band.
-    Cleans NaNs and protects against constant bands.
+    Normalizes input 9-band patch (excluding label).
+    - Assumes patch shape = (H, W, 9)
+    - Normalize each band to [0, 1] range
     """
-    patch = np.nan_to_num(patch, nan=0.0, posinf=0.0, neginf=0.0)  # Global cleanup
-    norm_patch = np.zeros_like(patch, dtype=np.float32)
-
-    for b in range(patch.shape[-1]):
-        band = patch[:, :, b].astype(np.float32)
-        band = np.nan_to_num(band, nan=0.0, posinf=0.0, neginf=0.0)
-
-        b_min = np.nanmin(band)
-        b_max = np.nanmax(band)
-
-        if np.isfinite(b_min) and np.isfinite(b_max) and b_max > b_min:
-            norm_patch[:, :, b] = (band - b_min) / (b_max - b_min)
-        else:
-            norm_patch[:, :, b] = 0.0  # fallback for bad band
-
-    return norm_patch
+    patch = np.clip(patch, 0, 1)  # assuming values are already scaled
+    return patch
 
 def compute_class_weight(mask_batch):
     """

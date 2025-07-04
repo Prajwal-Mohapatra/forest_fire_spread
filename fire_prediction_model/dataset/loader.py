@@ -4,6 +4,7 @@ import rasterio
 from tensorflow.keras.utils import Sequence
 from sklearn.utils import shuffle
 import random
+from dataset.preprocess import normalize_patch  # ✅ Imported normalization
 
 class FireDatasetGenerator(Sequence):
     def __init__(self, tif_paths, patch_size=256, batch_size=8, n_patches_per_img=50,
@@ -37,12 +38,16 @@ class FireDatasetGenerator(Sequence):
             with rasterio.open(tif_path) as src:
                 patch = src.read(window=rasterio.windows.Window(x, y, self.patch_size, self.patch_size))
                 patch = np.moveaxis(patch, 0, -1)  # (H, W, C)
-            img = patch[:, :, :9].astype('float32') / 255.0
-            mask = (patch[:, :, 9] > 0).astype('float32')  # Fire mask
+
+            # ✅ Use normalize_patch instead of manual scaling
+            img = normalize_patch(patch[:, :, :9].astype('float32'))
+            mask = (patch[:, :, 9] > 0).astype('float32')
             mask = np.expand_dims(mask, axis=-1)
+
             if self.augment_fn:
                 augmented = self.augment_fn(image=img, mask=mask)
                 img, mask = augmented['image'], augmented['mask']
+
             X.append(img)
             Y.append(mask)
         return np.array(X), np.array(Y)

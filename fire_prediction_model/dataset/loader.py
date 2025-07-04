@@ -4,6 +4,7 @@ import rasterio
 from tensorflow.keras.utils import Sequence
 from sklearn.utils import shuffle
 import random
+from dataset.preprocess import normalize_patch  # ✅ Your normalization function
 
 class FireDatasetGenerator(Sequence):
     def __init__(self, tif_paths, patch_size=256, batch_size=8, n_patches_per_img=50,
@@ -35,26 +36,32 @@ class FireDatasetGenerator(Sequence):
         X, Y = [], []
         i = idx * self.batch_size
         retries = 0
-        # max_retries = 1000
+        max_retries = 100
 
-        while len(X) < self.batch_size:
+        while len(X) < self.batch_size and retries < max_retries:
             tif_path, x, y = self.samples[i % len(self.samples)]
             i += 1
             retries += 1
 
             with rasterio.open(tif_path) as src:
                 patch = src.read(window=rasterio.windows.Window(x, y, self.patch_size, self.patch_size),
-                                boundless=True, fill_value=0).astype('float32')
-            patch = np.nan_to_num(patch, nan=0.0, posinf=0.0, neginf=0.0)
-            patch = np.moveaxis(patch, 0, -1)
+                                 boundless=True, fill_value=0).astype('float32')
 
-            img = patch[:, :, :9]
+            patch = np.nan_to_num(patch, nan=0.0, posinf=0.0, neginf=0.0)
+            patch = np.moveaxis(patch, 0, -1)  # (H, W, C)
+
+            # ✅ Normalize image bands (first 9)
+            img = normalize_patch(patch[:, :, :9])
+
+            # ✅ Create binary fire mask
             mask = (patch[:, :, 9] > 0).astype('float32')
             mask = np.expand_dims(mask, -1)
 
+            # ✅ Skip invalid patches
             if np.std(img) < 1e-5 or np.all(mask == 0):
-                continue  # Skip bad patch
+                continue
 
+            # ✅ Apply augmentation
             if self.augment_fn:
                 augmented = self.augment_fn(image=img, mask=mask)
                 img, mask = augmented['image'], augmented['mask']
@@ -63,7 +70,6 @@ class FireDatasetGenerator(Sequence):
             Y.append(mask)
 
         if len(X) == 0:
-            raise RuntimeError(f"❌ Failed to collect valid patches for batch {idx}.")
+            raise RuntimeError(f"❌ Failed to collect valid patches for batch {idx} after {max_retries} retries.")
 
         return np.array(X), np.array(Y)
-

@@ -4,7 +4,7 @@ import rasterio
 from tensorflow.keras.utils import Sequence
 from sklearn.utils import shuffle
 import random
-from dataset.preprocess import normalize_patch
+from dataset.preprocess import normalize_patch  # uses per-band normalization
 
 class FireDatasetGenerator(Sequence):
     def __init__(self, tif_paths, patch_size=256, batch_size=8, n_patches_per_img=50,
@@ -38,7 +38,7 @@ class FireDatasetGenerator(Sequence):
         X, Y = [], []
         i = idx * self.batch_size
         retries = 0
-        max_retries = 200  # Increased for better sampling
+        max_retries = 200
 
         while len(X) < self.batch_size and retries < max_retries:
             tif_path, x, y = self.samples[i % len(self.samples)]
@@ -62,8 +62,8 @@ class FireDatasetGenerator(Sequence):
             mask = (patch[:, :, 9] > 0).astype('float32')
             mask = np.expand_dims(mask, -1)
 
-            # 🔥 Reject background-only masks & flat patches
-            if np.std(img) < 1e-5 or np.sum(mask) < 100:  # threshold to prefer fire
+            # 🔥 Try to sample fire patches
+            if np.std(img) < 1e-5 or np.sum(mask) < 3:
                 continue
 
             if self.augment_fn:
@@ -73,7 +73,24 @@ class FireDatasetGenerator(Sequence):
             X.append(img)
             Y.append(mask)
 
+        # 🔁 Fallback if no fire patch found
         if len(X) == 0:
-            raise RuntimeError(f"❌ Failed to collect valid patches for batch {idx} after {max_retries} retries.")
+            print(f"⚠️ No fire patches in batch {idx}, falling back to random sampling...")
+            while len(X) < self.batch_size:
+                tif_path, x, y = random.choice(self.samples)
+                with rasterio.open(tif_path) as src:
+                    patch = src.read(
+                        window=rasterio.windows.Window(x, y, self.patch_size, self.patch_size),
+                        boundless=True, fill_value=0
+                    ).astype('float32')
+                patch = np.nan_to_num(patch, nan=0.0, posinf=0.0, neginf=0.0)
+                patch = np.moveaxis(patch, 0, -1)
+
+                img = normalize_patch(patch[:, :, :9])
+                mask = (patch[:, :, 9] > 0).astype('float32')
+                mask = np.expand_dims(mask, -1)
+
+                X.append(img)
+                Y.append(mask)
 
         return np.array(X), np.array(Y)

@@ -179,7 +179,7 @@ os.makedirs('outputs/checkpoints', exist_ok=True)
 os.makedirs('outputs/logs', exist_ok=True)
 
 checkpoint_cb = ModelCheckpoint(
-    'outputs/checkpoints/model_best.h5',
+    'outputs/checkpoints/model_best.weights.h5',
     monitor='val_iou_score',
     save_best_only=True,
     save_weights_only=True,

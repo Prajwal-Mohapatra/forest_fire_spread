@@ -28,9 +28,8 @@ def configure_tensorflow_for_gtx1650ti():
             for gpu in gpus:
                 tf.config.experimental.set_memory_growth(gpu, True)
             
-            # Set memory limit to prevent OOM (use 90% of 4GB)
-            tf.config.experimental.set_memory_limit(gpus[0], 3600)
-            print(f"✅ GPU memory limit set to 3.6GB for GTX 1650 Ti")
+            # For GTX 1650 Ti, use memory growth instead of hard limit
+            print(f"✅ GPU memory growth enabled for GTX 1650 Ti")
             
         except RuntimeError as e:
             print(f"⚠️ GPU configuration warning: {e}")
@@ -250,7 +249,7 @@ def main():
     
     callbacks = [
         ModelCheckpoint(
-            'outputs/checkpoints/model_best_gtx1650ti.h5',
+            'outputs/checkpoints/model_best_gtx1650ti.weights.h5',
             monitor='val_iou_score',
             save_best_only=True,
             save_weights_only=True,  # Save weights only to save space

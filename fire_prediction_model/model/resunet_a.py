@@ -55,36 +55,29 @@ def atrous_spatial_pyramid_pooling(x, output_filters=256, rates=[6, 12, 18], use
     
     # Global average pooling branch (optional)
     if use_global_pooling:
-        # Create a custom layer for global pooling and resizing
-        class GlobalPoolingBranch(layers.Layer):
-            def __init__(self, filters, **kwargs):
-                super().__init__(**kwargs)
-                self.filters = filters
-                self.global_pool = layers.GlobalAveragePooling2D(keepdims=True)
-                self.conv = layers.Conv2D(filters, 1, use_bias=False)
-                self.bn = layers.BatchNormalization()
-                self.relu = layers.ReLU()
-            
-            def call(self, inputs):
-                # Get input shape
-                input_shape = tf.shape(inputs)
-                height, width = input_shape[1], input_shape[2]
-                
-                # Global pooling
-                pooled = self.global_pool(inputs)
-                pooled = self.conv(pooled)
-                pooled = self.bn(pooled)
-                pooled = self.relu(pooled)
-                
-                # Resize using tf.image.resize wrapped in Lambda layer
-                def resize_fn(x):
-                    return tf.image.resize(x, [height, width], method='bilinear')
-                
-                resized = layers.Lambda(resize_fn)(pooled)
-                return resized
+        # Global pooling using Keras layers only
+        pooled = layers.GlobalAveragePooling2D(keepdims=True)(x)
+        pooled = layers.Conv2D(output_filters, 1, use_bias=False)(pooled)
+        pooled = layers.BatchNormalization()(pooled)
+        pooled = layers.ReLU()(pooled)
         
-        global_branch = GlobalPoolingBranch(output_filters)(x)
-        branches.append(global_branch)
+        # Upsample to match input spatial dimensions
+        # Use UpSampling2D which works with symbolic tensors
+        target_size = (x.shape[1], x.shape[2])  # Get static shape
+        if target_size[0] is not None and target_size[1] is not None:
+            # Calculate upsampling factor
+            current_size = (1, 1)  # Global pooling reduces to 1x1
+            scale_h = target_size[0] // current_size[0]
+            scale_w = target_size[1] // current_size[1]
+            
+            global_branch = layers.UpSampling2D(size=(scale_h, scale_w), 
+                                              interpolation='bilinear')(pooled)
+        else:
+            # Fallback: skip global pooling branch if shape is dynamic
+            global_branch = None
+        
+        if global_branch is not None:
+            branches.append(global_branch)
     
     # Concatenate all branches
     concat = layers.Concatenate()(branches)

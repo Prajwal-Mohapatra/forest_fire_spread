@@ -1,5 +1,6 @@
 import os
 import glob
+import re
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
@@ -22,23 +23,30 @@ class GPUMemoryLogger(tf.keras.callbacks.Callback):
             except:
                 pass
 
-# ====== Paths ======
+# ====== Paths & File Splits ======
 base_dir  = '/kaggle/input/stacked-fire-probability-prediction-dataset/dataset_stacked'
-all_files = sorted(glob.glob(os.path.join(base_dir, 'stack_2016_*.tif')))
+pattern   = os.path.join(base_dir, 'stack_2016_*.tif')
+all_files = sorted(glob.glob(pattern))
 
-train_files = [f for f in all_files if '_04_' in f]        # April 1–30
-# Correctly pick May 1–7:
-val_files = [f for f in all_files
-             if '_05_' in f and 1 <= int(os.path.basename(f)[13:15]) <= 7]
-test_files = [f for f in all_files
-              if '_05_' in f and 23 <= int(os.path.basename(f)[13:15]) <= 29]
+# regex to extract month and day from filenames like stack_2016_05_03.tif
+date_re = re.compile(r'stack_\d{4}_(\d{2})_(\d{2})\.tif$')
 
-print("Train days:", len(train_files), "=> Pairs:", len(train_files)-1)
-print("Val days:  ", len(val_files),   "=> Pairs:", len(val_files)-1)
+train_files, val_files, test_files = [], [], []
+for f in all_files:
+    m = date_re.search(os.path.basename(f))
+    if not m:
+        continue
+    month, day = m.group(1), int(m.group(2))
+    if month == '04':                      # April 1–30
+        train_files.append(f)
+    elif month == '05' and 1 <= day <= 7:  # May 1–7
+        val_files.append(f)
+    elif month == '05' and 23 <= day <= 29:# May 23–29
+        test_files.append(f)
 
-# ====== Generators ======
-#train_gen = FireDatasetGenerator(train_files, n_patches_per_day=50, ...)
-#val_gen   = FireDatasetGenerator(val_files,   n_patches_per_day=20, shuffle=False)
+print(f"Train days: {len(train_files)} ⇒ Pairs: {max(0, len(train_files)-1)}")
+print(f"Val   days: {len(val_files)} ⇒ Pairs: {max(0, len(val_files)-1)}")
+print(f"Test  days: {len(test_files)} ⇒ Pairs: {max(0, len(test_files)-1)}")
 
 # ====== Data Generators ======
 train_gen = FireDatasetGenerator(
@@ -104,18 +112,18 @@ history = model.fit(
 plt.figure(figsize=(15, 4))
 
 plt.subplot(1, 3, 1)
-plt.plot(history.history['loss'],     label='Train Loss')
-plt.plot(history.history['val_loss'], label='Val Loss')
+plt.plot(history.history['loss'],     '-o', label='Train Loss')
+plt.plot(history.history['val_loss'], '-o', label='Val Loss')
 plt.title('Loss'); plt.legend()
 
 plt.subplot(1, 3, 2)
-plt.plot(history.history['iou_score'],     label='Train IoU')
-plt.plot(history.history['val_iou_score'], label='Val IoU')
+plt.plot(history.history['iou_score'],     '-o', label='Train IoU')
+plt.plot(history.history['val_iou_score'], '-o', label='Val IoU')
 plt.title('IoU'); plt.legend()
 
 plt.subplot(1, 3, 3)
-plt.plot(history.history['dice_coef'],     label='Train Dice')
-plt.plot(history.history['val_dice_coef'], label='Val Dice')
+plt.plot(history.history['dice_coef'],     '-o', label='Train Dice')
+plt.plot(history.history['val_dice_coef'], '-o', label='Val Dice')
 plt.title('Dice'); plt.legend()
 
 plt.tight_layout()

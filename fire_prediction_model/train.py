@@ -26,9 +26,19 @@ class GPUMemoryLogger(tf.keras.callbacks.Callback):
 base_dir  = '/kaggle/input/stacked-fire-probability-prediction-dataset/dataset_stacked'
 all_files = sorted(glob.glob(os.path.join(base_dir, 'stack_2016_*.tif')))
 
-train_files = [f for f in all_files if '_04_' in f]        # April
-val_files   = [f for f in all_files if '_05_0[1-7]' in f]  # May 1–7
-test_files  = [f for f in all_files if '_05_2[3-9]' in f]  # May 23–29
+train_files = [f for f in all_files if '_04_' in f]        # April 1–30
+# Correctly pick May 1–7:
+val_files = [f for f in all_files
+             if '_05_' in f and 1 <= int(os.path.basename(f)[13:15]) <= 7]
+test_files = [f for f in all_files
+              if '_05_' in f and 23 <= int(os.path.basename(f)[13:15]) <= 29]
+
+print("Train days:", len(train_files), "=> Pairs:", len(train_files)-1)
+print("Val days:  ", len(val_files),   "=> Pairs:", len(val_files)-1)
+
+# ====== Generators ======
+#train_gen = FireDatasetGenerator(train_files, n_patches_per_day=50, ...)
+#val_gen   = FireDatasetGenerator(val_files,   n_patches_per_day=20, shuffle=False)
 
 # ====== Data Generators ======
 train_gen = FireDatasetGenerator(

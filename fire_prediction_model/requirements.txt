@@ -1,12 +1,28 @@
 # requirements.txt
-# Install in Colab with: !pip install -r requirements.txt
+# Forest Fire Prediction Model Dependencies
+# Install with: pip install -r requirements.txt
 
-rasterio
-numpy
+# Core ML and Data Processing
 tensorflow>=2.10
-opencv-python
-scikit-learn
-matplotlib
-tqdm
+numpy>=1.21.0
+rasterio>=1.3.0
+scikit-learn>=1.0.0
+opencv-python>=4.5.0
+
+# Visualization and Monitoring
+matplotlib>=3.5.0
+tqdm>=4.64.0
+
+# Data Augmentation
+albumentations>=1.3.0
+
+# Configuration and Utilities
+PyYAML>=6.0
+psutil>=5.8.0
+
+# Testing Dependencies (for development)
+unittest2>=1.1.0
+mock>=4.0.0
+
+# Optional: Enhanced U-Net models (if using external implementations)
 keras-unet-collection
-albumentations

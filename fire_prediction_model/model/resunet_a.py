@@ -27,41 +27,57 @@ def residual_block(x, filters, kernel_size=3, dilation=1, stride=1):
     x = layers.ReLU()(x)
     return x
 
-def atrous_spatial_pyramid_pooling(x, output_filters=256):
+def atrous_spatial_pyramid_pooling(x, output_filters=256, rates=[6, 12, 18], use_global_pooling=True):
     """
-    ASPP module for multi-scale feature extraction.
-    """
-    # Image-level features
-    image_pooling = layers.GlobalAveragePooling2D(keepdims=True)(x)
-    image_pooling = layers.Conv2D(output_filters, 1, use_bias=False)(image_pooling)
-    image_pooling = layers.BatchNormalization()(image_pooling)
-    image_pooling = layers.ReLU()(image_pooling)
-    image_pooling = layers.UpSampling2D(size=(x.shape[1], x.shape[2]), interpolation='bilinear')(image_pooling)
+    Enhanced ASPP module with configurable dilation rates and optional global pooling.
     
-    # Multi-scale dilated convolutions
+    Args:
+        x: Input tensor
+        output_filters: Number of output filters for each branch
+        rates: List of dilation rates for parallel convolutions
+        use_global_pooling: Whether to include global average pooling branch
+    """
+    branches = []
+    
+    # 1x1 convolution branch
     conv_1x1 = layers.Conv2D(output_filters, 1, use_bias=False)(x)
     conv_1x1 = layers.BatchNormalization()(conv_1x1)
     conv_1x1 = layers.ReLU()(conv_1x1)
+    branches.append(conv_1x1)
     
-    conv_3x3_1 = layers.Conv2D(output_filters, 3, padding='same', dilation_rate=6, use_bias=False)(x)
-    conv_3x3_1 = layers.BatchNormalization()(conv_3x3_1)
-    conv_3x3_1 = layers.ReLU()(conv_3x3_1)
+    # Multi-scale dilated convolutions
+    for rate in rates:
+        conv = layers.Conv2D(output_filters, 3, padding='same', 
+                           dilation_rate=rate, use_bias=False)(x)
+        conv = layers.BatchNormalization()(conv)
+        conv = layers.ReLU()(conv)
+        branches.append(conv)
     
-    conv_3x3_2 = layers.Conv2D(output_filters, 3, padding='same', dilation_rate=12, use_bias=False)(x)
-    conv_3x3_2 = layers.BatchNormalization()(conv_3x3_2)
-    conv_3x3_2 = layers.ReLU()(conv_3x3_2)
+    # Global average pooling branch (optional)
+    if use_global_pooling:
+        # Get input spatial dimensions dynamically
+        input_shape = tf.shape(x)
+        height, width = input_shape[1], input_shape[2]
+        
+        global_pool = layers.GlobalAveragePooling2D(keepdims=True)(x)
+        global_pool = layers.Conv2D(output_filters, 1, use_bias=False)(global_pool)
+        global_pool = layers.BatchNormalization()(global_pool)
+        global_pool = layers.ReLU()(global_pool)
+        
+        # Resize to match input dimensions
+        global_pool = tf.image.resize(global_pool, [height, width], method='bilinear')
+        branches.append(global_pool)
     
-    conv_3x3_3 = layers.Conv2D(output_filters, 3, padding='same', dilation_rate=18, use_bias=False)(x)
-    conv_3x3_3 = layers.BatchNormalization()(conv_3x3_3)
-    conv_3x3_3 = layers.ReLU()(conv_3x3_3)
+    # Concatenate all branches
+    concat = layers.Concatenate()(branches)
     
-    # Concatenate all features
-    concat = layers.Concatenate()([image_pooling, conv_1x1, conv_3x3_1, conv_3x3_2, conv_3x3_3])
-    
-    # Final projection
+    # Final projection to reduce channel dimension
     output = layers.Conv2D(output_filters, 1, use_bias=False)(concat)
     output = layers.BatchNormalization()(output)
     output = layers.ReLU()(output)
+    
+    # Optional dropout for regularization
+    output = layers.Dropout(0.1)(output)
     
     return output
 
@@ -91,9 +107,14 @@ def improved_attention_gate(x, g, inter_channels):
     
     return attended_x
 
-def build_resunet_a(input_shape=(256, 256, 9), num_classes=1):
+def build_resunet_a(input_shape=(256, 256, 9), num_classes=1, use_enhanced_aspp=False):
     """
     ResUNet-A implementation with proper residual blocks, ASPP, and attention gates.
+    
+    Args:
+        input_shape: Input tensor shape
+        num_classes: Number of output classes
+        use_enhanced_aspp: Whether to use the enhanced ASPP module in the bridge
     """
     inputs = Input(shape=input_shape)
 
@@ -110,11 +131,18 @@ def build_resunet_a(input_shape=(256, 256, 9), num_classes=1):
     c4 = residual_block(p3, 512)
     p4 = layers.MaxPooling2D((2, 2))(c4)
 
-    # Bridge with multi-scale dilated convolutions (simplified ASPP)
-    bridge1 = residual_block(p4, 1024, dilation=1)
-    bridge2 = residual_block(p4, 1024, dilation=2)
-    bridge3 = residual_block(p4, 1024, dilation=4)
-    bridge = layers.Add()([bridge1, bridge2, bridge3])
+    # Bridge with optional enhanced ASPP
+    if use_enhanced_aspp:
+        # Use enhanced ASPP module
+        bridge = atrous_spatial_pyramid_pooling(p4, output_filters=1024, 
+                                              rates=[6, 12, 18], 
+                                              use_global_pooling=True)
+    else:
+        # Original multi-scale dilated convolutions
+        bridge1 = residual_block(p4, 1024, dilation=1)
+        bridge2 = residual_block(p4, 1024, dilation=2)
+        bridge3 = residual_block(p4, 1024, dilation=4)
+        bridge = layers.Add()([bridge1, bridge2, bridge3])
 
     # Decoder with attention
     u4 = layers.UpSampling2D((2, 2))(bridge)

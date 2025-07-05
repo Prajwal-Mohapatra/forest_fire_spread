@@ -1,0 +1,117 @@
+# Enhanced Forest Fire Prediction Model Configuration
+# Updated with comprehensive model improvements
+
+# Model Architecture Configuration
+model:
+  input_shape: [256, 256, 9] # Height, Width, Channels
+  num_classes: 1 # Binary classification (fire/no-fire)
+  use_enhanced_aspp: true # Use enhanced ASPP module in bridge
+
+# Training Configuration
+training:
+  batch_size: 8
+  epochs: 30
+  learning_rate: 0.0001 # 1e-4
+  n_patches_per_img_train: 50 # Patches per image during training
+  n_patches_per_img_val: 20 # Patches per image during validation
+
+  # Loss function selection (only one should be true)
+  use_focal_loss: true
+  use_combined_loss: false
+  use_weighted_bce: false
+
+# Loss Function Parameters
+loss:
+  focal_alpha: 0.25 # Alpha parameter for focal loss
+  focal_gamma: 2.0 # Gamma parameter for focal loss
+  dice_weight: 0.5 # Weight for dice component in combined loss
+  focal_weight: 0.5 # Weight for focal component in combined loss
+
+# Data Configuration
+data:
+  base_dir: "./fire-probability-prediction-map-unstacked-data/dataset_stacked"
+  train_pattern: "stack_2016_04_*.tif"
+  val_pattern: "stack_2016_05_0[1-7]*.tif"
+  test_pattern: "stack_2016_05_2[3-9]*.tif"
+
+  # Normalization parameters
+  normalize_per_channel: true
+  patch_size: 256
+  overlap: 64 # Overlap between patches during inference
+
+# ASPP Configuration (when use_enhanced_aspp is true)
+aspp:
+  output_filters: 256
+  dilation_rates: [6, 12, 18]
+  use_global_pooling: true
+  dropout_rate: 0.1
+
+# Attention Gate Configuration
+attention:
+  inter_channels_ratio: 0.5 # Ratio of input channels for attention computation
+
+# Callbacks Configuration
+callbacks:
+  # Model checkpointing
+  checkpoint:
+    monitor: "val_iou_score"
+    mode: "max"
+    save_best_only: true
+    save_weights_only: true
+
+  # Learning rate reduction
+  reduce_lr:
+    monitor: "val_loss"
+    factor: 0.5
+    patience: 5
+    min_lr: 0.0000001 # 1e-7
+
+  # Early stopping (optional)
+  early_stopping:
+    enabled: false
+    monitor: "val_loss"
+    patience: 10
+    restore_best_weights: true
+
+# Evaluation Configuration
+evaluation:
+  threshold: 0.5 # Classification threshold
+  save_predictions: true
+  save_detailed_report: true
+  plot_metrics_trends: true
+
+# Output Directories
+output:
+  base_dir: "outputs"
+  checkpoints_dir: "outputs/checkpoints"
+  logs_dir: "outputs/logs"
+  predictions_dir: "outputs/predictions"
+  evaluation_dir: "outputs/evaluation"
+  versions_dir: "outputs/versions"
+
+# Hardware Configuration
+hardware:
+  use_gpu: true
+  mixed_precision: false # Enable for faster training on compatible GPUs
+  memory_growth: true # Allow GPU memory to grow as needed
+
+# Reproducibility
+random_seed: 42
+
+# Advanced Training Options
+advanced:
+  # Class weight computation
+  compute_class_weights: true
+  class_weight_samples: 10 # Number of batches to sample for class weight computation
+
+  # Data augmentation (if implemented)
+  augmentation:
+    enabled: false
+    rotation_range: 15
+    horizontal_flip: true
+    vertical_flip: true
+
+  # Model ensemble (for future implementation)
+  ensemble:
+    enabled: false
+    num_models: 5

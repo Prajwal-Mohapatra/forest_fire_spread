@@ -33,7 +33,7 @@ wheels/
 
 # ML model outputs
 fire_prediction_model/output/
-fire_prediction_model/outputs/
+# fire_prediction_model/outputs/
 *.h5
 *.hdf5
 *.pkl

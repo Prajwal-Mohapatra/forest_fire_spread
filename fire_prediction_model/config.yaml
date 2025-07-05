@@ -9,7 +9,7 @@ model:
 
 # Training Configuration
 training:
-  batch_size: 2  # Reduced from 8 for GTX 1650 Ti
+  batch_size: 2 # Reduced from 8 for GTX 1650 Ti
   epochs: 30
   learning_rate: 0.0001 # 1e-4
   n_patches_per_img_train: 20 # Reduced from 50

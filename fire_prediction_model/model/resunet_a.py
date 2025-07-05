@@ -55,18 +55,36 @@ def atrous_spatial_pyramid_pooling(x, output_filters=256, rates=[6, 12, 18], use
     
     # Global average pooling branch (optional)
     if use_global_pooling:
-        # Get input spatial dimensions dynamically
-        input_shape = tf.shape(x)
-        height, width = input_shape[1], input_shape[2]
+        # Create a custom layer for global pooling and resizing
+        class GlobalPoolingBranch(layers.Layer):
+            def __init__(self, filters, **kwargs):
+                super().__init__(**kwargs)
+                self.filters = filters
+                self.global_pool = layers.GlobalAveragePooling2D(keepdims=True)
+                self.conv = layers.Conv2D(filters, 1, use_bias=False)
+                self.bn = layers.BatchNormalization()
+                self.relu = layers.ReLU()
+            
+            def call(self, inputs):
+                # Get input shape
+                input_shape = tf.shape(inputs)
+                height, width = input_shape[1], input_shape[2]
+                
+                # Global pooling
+                pooled = self.global_pool(inputs)
+                pooled = self.conv(pooled)
+                pooled = self.bn(pooled)
+                pooled = self.relu(pooled)
+                
+                # Resize using tf.image.resize wrapped in Lambda layer
+                def resize_fn(x):
+                    return tf.image.resize(x, [height, width], method='bilinear')
+                
+                resized = layers.Lambda(resize_fn)(pooled)
+                return resized
         
-        global_pool = layers.GlobalAveragePooling2D(keepdims=True)(x)
-        global_pool = layers.Conv2D(output_filters, 1, use_bias=False)(global_pool)
-        global_pool = layers.BatchNormalization()(global_pool)
-        global_pool = layers.ReLU()(global_pool)
-        
-        # Resize to match input dimensions
-        global_pool = tf.image.resize(global_pool, [height, width], method='bilinear')
-        branches.append(global_pool)
+        global_branch = GlobalPoolingBranch(output_filters)(x)
+        branches.append(global_branch)
     
     # Concatenate all branches
     concat = layers.Concatenate()(branches)

@@ -9,11 +9,11 @@ model:
 
 # Training Configuration
 training:
-  batch_size: 8
+  batch_size: 2  # Reduced from 8 for GTX 1650 Ti
   epochs: 30
   learning_rate: 0.0001 # 1e-4
-  n_patches_per_img_train: 50 # Patches per image during training
-  n_patches_per_img_val: 20 # Patches per image during validation
+  n_patches_per_img_train: 20 # Reduced from 50
+  n_patches_per_img_val: 10 # Reduced from 20
 
   # Loss function selection (only one should be true)
   use_focal_loss: true

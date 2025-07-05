@@ -45,6 +45,33 @@ def load_training_config(config_path="config.yaml"):
             }
         }
 
+# Configure TensorFlow for stability
+def configure_tensorflow():
+    """Configure TensorFlow settings for stable training."""
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if gpus:
+        try:
+            # Enable memory growth to prevent memory fragmentation
+            for gpu in gpus:
+                tf.config.experimental.set_memory_growth(gpu, True)
+            print(f"✅ Configured {len(gpus)} GPU(s) with memory growth")
+        except RuntimeError as e:
+            print(f"⚠️ GPU configuration failed: {e}")
+    
+    # Set thread configurations for stability
+    tf.config.threading.set_intra_op_parallelism_threads(0)  # Use all available cores
+    tf.config.threading.set_inter_op_parallelism_threads(0)  # Use all available cores
+    
+    # Enable mixed precision for GTX 1650 Ti (optional, can save memory)
+    # tf.keras.mixed_precision.set_global_policy('mixed_float16')
+    
+    # Set environment variables for stability
+    os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
+    os.environ['TF_GPU_ALLOCATOR'] = 'cuda_malloc_async'
+
+# Configure TensorFlow
+configure_tensorflow()
+
 # Load configuration
 config = load_training_config()
 print(f"📋 Loaded training configuration")
@@ -176,12 +203,27 @@ callbacks = [checkpoint_cb, tensorboard_cb, csv_logger_cb, gpu_logger_cb, reduce
 epochs = config['training']['epochs']
 print(f"\n🚀 Starting training for {epochs} epochs...")
 
-history = model.fit(
-    train_gen,
-    validation_data=val_gen,
-    epochs=epochs,
-    callbacks=callbacks
-)
+# Training with better error handling
+try:
+    history = model.fit(
+        train_gen,
+        validation_data=val_gen,
+        epochs=epochs,
+        callbacks=callbacks,
+        verbose=1,
+        workers=1,  # Use single worker to avoid multiprocessing issues
+        use_multiprocessing=False,  # Disable multiprocessing
+        max_queue_size=10  # Limit queue size to prevent memory issues
+    )
+except Exception as e:
+    print(f"❌ Training failed: {e}")
+    # Try to save partial model if training fails
+    try:
+        model.save_weights('outputs/checkpoints/emergency_checkpoint.h5')
+        print("💾 Emergency checkpoint saved")
+    except:
+        pass
+    raise
 
 # ====== Save Model Version with Metadata ======
 training_metadata = {

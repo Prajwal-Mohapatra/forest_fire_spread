@@ -84,15 +84,21 @@ class FireDatasetGenerator(Sequence):
             retries += 1
 
             try:
+                # Use context manager to ensure proper file cleanup
                 with rasterio.open(tif_path) as src:
                     patch = src.read(
                         window=rasterio.windows.Window(x, y, self.patch_size, self.patch_size),
                         boundless=True, fill_value=0
                     ).astype('float32')
+                    
+                    # Clean up immediately
+                    del src
+                    
             except Exception as e:
                 print(f"⚠️ Skipping invalid patch from {tif_path}: {e}")
                 continue
 
+            # Clean NaN/Inf values immediately
             patch = np.nan_to_num(patch, nan=0.0, posinf=0.0, neginf=0.0)
             patch = np.moveaxis(patch, 0, -1)  # (H, W, C)
 
@@ -105,30 +111,61 @@ class FireDatasetGenerator(Sequence):
                 continue
 
             if self.augment_fn:
-                augmented = self.augment_fn(image=img, mask=mask)
-                img, mask = augmented['image'], augmented['mask']
+                try:
+                    augmented = self.augment_fn(image=img, mask=mask)
+                    img, mask = augmented['image'], augmented['mask']
+                except Exception as e:
+                    print(f"⚠️ Augmentation failed: {e}")
+                    # Continue without augmentation
 
             X.append(img)
             Y.append(mask)
+            
+            # Clear variables to free memory
+            del patch, img, mask
 
         # Fallback if still no valid patches
         if len(X) == 0:
             print(f"⚠️ No valid patches in batch {idx}, using fallback sampling...")
             while len(X) < self.batch_size:
-                tif_path, x, y = random.choice(self.samples)[:3]
-                with rasterio.open(tif_path) as src:
-                    patch = src.read(
-                        window=rasterio.windows.Window(x, y, self.patch_size, self.patch_size),
-                        boundless=True, fill_value=0
-                    ).astype('float32')
-                patch = np.nan_to_num(patch, nan=0.0, posinf=0.0, neginf=0.0)
-                patch = np.moveaxis(patch, 0, -1)
+                try:
+                    tif_path, x, y = random.choice(self.samples)[:3]
+                    with rasterio.open(tif_path) as src:
+                        patch = src.read(
+                            window=rasterio.windows.Window(x, y, self.patch_size, self.patch_size),
+                            boundless=True, fill_value=0
+                        ).astype('float32')
+                    
+                    patch = np.nan_to_num(patch, nan=0.0, posinf=0.0, neginf=0.0)
+                    patch = np.moveaxis(patch, 0, -1)
 
-                img = normalize_patch(patch[:, :, :9])
-                mask = (patch[:, :, 9] > 0).astype('float32')
-                mask = np.expand_dims(mask, -1)
+                    img = normalize_patch(patch[:, :, :9])
+                    mask = (patch[:, :, 9] > 0).astype('float32')
+                    mask = np.expand_dims(mask, -1)
 
-                X.append(img)
-                Y.append(mask)
+                    X.append(img)
+                    Y.append(mask)
+                    
+                    del patch, img, mask
+                except Exception as e:
+                    print(f"⚠️ Fallback sampling failed: {e}")
+                    # Create dummy data to prevent crash
+                    X.append(np.zeros((self.patch_size, self.patch_size, 9), dtype=np.float32))
+                    Y.append(np.zeros((self.patch_size, self.patch_size, 1), dtype=np.float32))
 
-        return np.array(X), np.array(Y)
+        # Convert to numpy arrays and ensure proper dtype
+        X_array = np.array(X, dtype=np.float32)
+        Y_array = np.array(Y, dtype=np.float32)
+        
+        # Clear intermediate lists
+        del X, Y
+        
+        return X_array, Y_array
+    
+    def on_epoch_end(self):
+        """Called at the end of each epoch for cleanup."""
+        if self.shuffle:
+            self.samples = shuffle(self.samples)
+        # Force garbage collection
+        import gc
+        gc.collect()

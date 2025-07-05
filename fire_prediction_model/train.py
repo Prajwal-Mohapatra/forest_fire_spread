@@ -23,38 +23,32 @@ class GPUMemoryLogger(tf.keras.callbacks.Callback):
                 pass
 
 # ====== Paths ======
-base_dir = '/kaggle/input/stacked-fire-probability-prediction-dataset/dataset_stacked'
+base_dir  = '/kaggle/input/stacked-fire-probability-prediction-dataset/dataset_stacked'
 all_files = sorted(glob.glob(os.path.join(base_dir, 'stack_2016_*.tif')))
 
-# Split by date:
 train_files = [f for f in all_files if '_04_' in f]        # April
-val_files   = [f for f in all_files if '_05_0[1-7]' in f]  # May 1–7
-test_files  = [f for f in all_files if '_05_2[3-9]' in f]  # May 23–29
+val_files   = [f for f in all_files if '_05_0[1-7]' in f]  # May 1–7
+test_files  = [f for f in all_files if '_05_2[3-9]' in f]  # May 23–29
 
 # ====== Data Generators ======
-# use `n_patches_per_day` instead of per_img
 train_gen = FireDatasetGenerator(
     tif_paths=train_files,
     patch_size=256,
     batch_size=8,
-    n_patches_per_day=50,    # how many patches to sample from each consecutive day‐pair
-    shuffle=True,
-    augment_fn=None
+    n_patches_per_day=50,
+    shuffle=True
 )
-
 val_gen = FireDatasetGenerator(
     tif_paths=val_files,
     patch_size=256,
     batch_size=8,
     n_patches_per_day=20,
-    shuffle=False,
-    augment_fn=None
+    shuffle=False
 )
 
 # ====== Estimate class weights ======
 print("Estimating fire/no-fire class balance...")
 pos = neg = 0
-# sample a few batches to get approximate ratio
 for i in range(5):
     _, masks = train_gen[i]
     pos += np.sum(masks == 1)
@@ -64,7 +58,6 @@ w_pos = neg / (pos + neg + 1e-6)
 w_neg = pos / (pos + neg + 1e-6)
 print(f"✅ Class weights: Fire = {w_pos:.4f}, NoFire = {w_neg:.4f}")
 
-# ====== Weighted BCE using fixed weights ======
 def weighted_bce_fixed(y_true, y_pred):
     bce = tf.keras.backend.binary_crossentropy(y_true, y_pred)
     weights = y_true * w_pos + (1 - y_true) * w_neg
@@ -94,29 +87,24 @@ history = model.fit(
     train_gen,
     validation_data=val_gen,
     epochs=30,
-    callbacks=callbacks,
-    use_multiprocessing=False,
-    workers=1
+    callbacks=callbacks
 )
 
 # ====== Plot Loss and Metrics ======
 plt.figure(figsize=(15, 4))
 
-# Loss
 plt.subplot(1, 3, 1)
-plt.plot(history.history['loss'], label='Train Loss')
+plt.plot(history.history['loss'],     label='Train Loss')
 plt.plot(history.history['val_loss'], label='Val Loss')
 plt.title('Loss'); plt.legend()
 
-# IoU
 plt.subplot(1, 3, 2)
-plt.plot(history.history['iou_score'], label='Train IoU')
+plt.plot(history.history['iou_score'],     label='Train IoU')
 plt.plot(history.history['val_iou_score'], label='Val IoU')
 plt.title('IoU'); plt.legend()
 
-# Dice
 plt.subplot(1, 3, 3)
-plt.plot(history.history['dice_coef'], label='Train Dice')
+plt.plot(history.history['dice_coef'],     label='Train Dice')
 plt.plot(history.history['val_dice_coef'], label='Val Dice')
 plt.title('Dice'); plt.legend()
 

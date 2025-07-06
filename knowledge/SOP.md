@@ -96,14 +96,28 @@ How can I apply these to my current project?
 
 ### **SOP-014: Git Commit Messages**
 ```
-Based on the following code changes, generate a clear and informative git commit message:
-[Paste your code diff here]
+Analyze the project fully, and based on the following code changes and our previous, generate a very "short", clear and informative git commit message
 ```
 
 ### **SOP-015: Merge Conflict Resolution**
 ```
 I'm facing the following merge conflict. How should I resolve it while maintaining the intended functionality of both changes?
 [Paste the conflict details here]
+```
+
+### **SOP-016: Detailed Project Documentation**
+```
+Based on the code and our discussions, analyze the code again, in detail, generate a folder, named `knowledge` in the root folder (if already present, add on to it) and add the following documentation in as much detail as possible:
+- README file section for each component and all the component that created or worked on in this session
+- progress report for the project, including from where we started, where we are know, and where we are heading
+- detailed summarization of the chat messages, important information, conclusions from all the question answer sessions
+- any other info related to the project should also be copied into the `knowledge` folder, which will be created in the root directory
+- if any particular documentation is already present, then add onto it, in as much detail as possible
+```
+
+### **SOP-015: Read files without lazing around**
+```
+remember, read entire files thoroughly — no truncation. Always process code from the first line to the last, never stopping arbitrarily (e.g., after 50 or 100 lines). Each read operation must cover at least 1000 lines, and continue beyond that if needed to cover the full file. Analyze all code elements: functions, classes, variables, imports/exports, and structure. Avoid phrases like "truncated for brevity" or "rest omitted" — these reflect incomplete work. Your analysis and suggestions must reflect full-file understanding, referencing and connecting code across the entire file to ensure accurate, contextual recommendations. Incomplete reads lead to poor results — thoroughness is non-negotiable.
 ```
 
 ---
@@ -300,7 +314,6 @@ When working with Claude on the forest fire project, establish context with:
 
 [Paste your specific context management need here]
 ```
-
 ---
 
 ## Usage Guidelines

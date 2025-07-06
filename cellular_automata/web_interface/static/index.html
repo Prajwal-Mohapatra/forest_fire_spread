@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forest Fire Simulation - Uttarakhand</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem 2rem;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header h1 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.8rem;
+            font-weight: 300;
+        }
+        
+        .header .subtitle {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.25rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+            height: calc(100vh - 120px);
+        }
+        
+        .control-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            height: fit-content;
+        }
+        
+        .simulation-area {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .section h3 {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #ffd700;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+            padding-bottom: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 0.9rem;
+        }
+        
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .coordinate-input {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .demo-scenarios {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .demo-btn {
+            padding: 0.5rem;
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            border-radius: 4px;
+            color: #ffd700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+        
+        .demo-btn:hover {
+            background: rgba(255, 215, 0, 0.3);
+        }
+        
+        .simulation-display {
+            flex: 1;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .status-display {
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        .status-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .status-text {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .status-details {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .animation-controls {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: none;
+        }
+        
+        .animation-controls.show {
+            display: block;
+        }
+        
+        .time-slider {
+            width: 100%;
+            margin: 1rem 0;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-top: 0.25rem;
+        }
+        
+        .loading {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        
+        .error {
+            color: #ff6b6b;
+        }
+        
+        .success {
+            color: #51cf66;
+        }
+        
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>
+            🔥 Forest Fire Simulation
+            <span style="font-size: 0.7em; opacity: 0.7;">Uttarakhand</span>
+        </h1>
+        <div class="subtitle">Real-time fire spread prediction using AI and cellular automata</div>
+    </header>
+
+    <div class="container">
+        <div class="control-panel">
+            <div class="section">
+                <h3>🎯 Ignition Point</h3>
+                <div class="form-group">
+                    <label>Coordinates (Lat, Lon)</label>
+                    <div class="coordinate-input">
+                        <input type="number" id="lat" placeholder="30.3165" step="0.0001" min="29" max="32">
+                        <input type="number" id="lon" placeholder="78.0322" step="0.0001" min="77" max="81">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🌬️ Weather Conditions</h3>
+                <div class="form-group">
+                    <label>Wind Direction (°)</label>
+                    <input type="number" id="windDir" value="45" min="0" max="360">
+                </div>
+                <div class="form-group">
+                    <label>Wind Speed (km/h)</label>
+                    <input type="number" id="windSpeed" value="15" min="0" max="100">
+                </div>
+                <div class="form-group">
+                    <label>Temperature (°C)</label>
+                    <input type="number" id="temperature" value="30" min="0" max="50">
+                </div>
+                <div class="form-group">
+                    <label>Humidity (%)</label>
+                    <input type="number" id="humidity" value="40" min="0" max="100">
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>⏰ Simulation</h3>
+                <div class="form-group">
+                    <label>Duration (hours)</label>
+                    <select id="duration">
+                        <option value="1">1 hour</option>
+                        <option value="2">2 hours</option>
+                        <option value="3">3 hours</option>
+                        <option value="6" selected>6 hours</option>
+                        <option value="12">12 hours</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <select id="date">
+                        <option value="2016-05-15" selected>May 15, 2016</option>
+                        <option value="2016-05-20">May 20, 2016</option>
+                        <option value="2016-05-25">May 25, 2016</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="runSimulation()">
+                🔥 Start Simulation
+            </button>
+
+            <div class="section">
+                <h3>🎬 Demo Scenarios</h3>
+                <div class="demo-scenarios">
+                    <button class="demo-btn" onclick="loadDemo('dehradun')">🏔️ Dehradun Valley Fire</button>
+                    <button class="demo-btn" onclick="loadDemo('rishikesh')">🌊 Rishikesh Forest Fire</button>
+                    <button class="demo-btn" onclick="loadDemo('nainital')">⛰️ Nainital Hill Fire</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="simulation-area">
+            <div class="simulation-display">
+                <div class="status-display">
+                    <div class="status-icon">🗺️</div>
+                    <div class="status-text">Ready to Simulate</div>
+                    <div class="status-details">Configure parameters and click "Start Simulation"</div>
+                </div>
+            </div>
+
+            <div class="animation-controls" id="animationControls">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h4>🎬 Animation Controls</h4>
+                    <div id="currentHour">Hour 0</div>
+                </div>
+                
+                <input type="range" id="timeSlider" class="time-slider" min="0" max="6" value="0" step="1">
+                
+                <div style="display: flex; justify-content: center; gap: 1rem; margin: 1rem 0;">
+                    <button class="btn btn-secondary" onclick="playAnimation()" id="playBtn">▶️ Play</button>
+                    <button class="btn btn-secondary" onclick="pauseAnimation()" id="pauseBtn">⏸️ Pause</button>
+                    <button class="btn btn-secondary" onclick="resetAnimation()">⏮️ Reset</button>
+                </div>
+                
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="burnedArea">0</div>
+                        <div class="stat-label">km² burned</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="burningCells">0</div>
+                        <div class="stat-label">active cells</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="maxIntensity">0</div>
+                        <div class="stat-label">max intensity</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSimulation = null;
+        let animationInterval = null;
+        let currentHour = 0;
+        let maxHours = 6;
+
+        const API_BASE = 'http://localhost:5000/api';
+
+        async function runSimulation() {
+            const lat = parseFloat(document.getElementById('lat').value) || 30.3165;
+            const lon = parseFloat(document.getElementById('lon').value) || 78.0322;
+            const windDir = parseInt(document.getElementById('windDir').value) || 45;
+            const windSpeed = parseInt(document.getElementById('windSpeed').value) || 15;
+            const temperature = parseInt(document.getElementById('temperature').value) || 30;
+            const humidity = parseInt(document.getElementById('humidity').value) || 40;
+            const duration = parseInt(document.getElementById('duration').value) || 6;
+            const date = document.getElementById('date').value || '2016-05-15';
+
+            const payload = {
+                ignition_points: [[lon, lat]],
+                weather_params: {
+                    wind_direction: windDir,
+                    wind_speed: windSpeed,
+                    temperature: temperature,
+                    relative_humidity: humidity
+                },
+                simulation_hours: duration,
+                date: date,
+                use_ml_prediction: false // Use synthetic for demo
+            };
+
+            showStatus('🔥', 'Running Simulation...', 'Processing fire spread calculation', 'loading');
+
+            try {
+                const response = await fetch(`${API_BASE}/simulate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    currentSimulation = result;
+                    maxHours = result.results.total_hours;
+                    
+                    showStatus('✅', 'Simulation Complete!', 
+                        `${maxHours} hours simulated successfully`, 'success');
+                    
+                    setupAnimationControls();
+                    updateStatistics(0);
+                } else {
+                    showStatus('❌', 'Simulation Failed', result.error, 'error');
+                }
+            } catch (error) {
+                showStatus('❌', 'Connection Error', error.message, 'error');
+            }
+        }
+
+        async function loadDemo(scenario) {
+            showStatus('🎬', 'Loading Demo...', `Starting ${scenario} scenario`, 'loading');
+
+            try {
+                const response = await fetch(`${API_BASE}/demo/run/${scenario}_fire`, {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    currentSimulation = result;
+                    maxHours = result.results.total_hours;
+                    
+                    showStatus('✅', 'Demo Loaded!', 
+                        `${scenario} simulation ready`, 'success');
+                    
+                    setupAnimationControls();
+                    updateStatistics(0);
+                } else {
+                    showStatus('❌', 'Demo Failed', result.error, 'error');
+                }
+            } catch (error) {
+                showStatus('❌', 'Demo Error', error.message, 'error');
+            }
+        }
+
+        function showStatus(icon, title, details, className = '') {
+            const display = document.querySelector('.status-display');
+            const iconEl = display.querySelector('.status-icon');
+            const titleEl = display.querySelector('.status-text');
+            const detailsEl = display.querySelector('.status-details');
+
+            iconEl.textContent = icon;
+            titleEl.textContent = title;
+            detailsEl.textContent = details;
+
+            // Reset classes
+            display.className = 'status-display';
+            if (className) {
+                display.classList.add(className);
+            }
+
+            // Hide animation controls if not success
+            const controls = document.getElementById('animationControls');
+            if (className !== 'success') {
+                controls.classList.remove('show');
+            }
+        }
+
+        function setupAnimationControls() {
+            const controls = document.getElementById('animationControls');
+            const slider = document.getElementById('timeSlider');
+            
+            controls.classList.add('show');
+            slider.max = maxHours;
+            slider.value = 0;
+            currentHour = 0;
+            
+            updateHourDisplay();
+        }
+
+        function updateHourDisplay() {
+            document.getElementById('currentHour').textContent = `Hour ${currentHour}`;
+            document.getElementById('timeSlider').value = currentHour;
+            
+            if (currentSimulation && currentSimulation.results.statistics) {
+                updateStatistics(currentHour);
+            }
+        }
+
+        function updateStatistics(hour) {
+            if (!currentSimulation || !currentSimulation.results.statistics) return;
+            
+            const stats = currentSimulation.results.statistics[hour] || {
+                burned_area_km2: 0,
+                total_burning_cells: 0,
+                max_intensity: 0
+            };
+            
+            document.getElementById('burnedArea').textContent = stats.burned_area_km2?.toFixed(2) || '0';
+            document.getElementById('burningCells').textContent = stats.total_burning_cells || '0';
+            document.getElementById('maxIntensity').textContent = stats.max_intensity?.toFixed(3) || '0';
+        }
+
+        function playAnimation() {
+            if (animationInterval) return;
+            
+            animationInterval = setInterval(() => {
+                currentHour++;
+                if (currentHour > maxHours) {
+                    currentHour = 0;
+                }
+                updateHourDisplay();
+            }, 1000);
+            
+            document.getElementById('playBtn').style.opacity = '0.5';
+            document.getElementById('pauseBtn').style.opacity = '1';
+        }
+
+        function pauseAnimation() {
+            if (animationInterval) {
+                clearInterval(animationInterval);
+                animationInterval = null;
+            }
+            
+            document.getElementById('playBtn').style.opacity = '1';
+            document.getElementById('pauseBtn').style.opacity = '0.5';
+        }
+
+        function resetAnimation() {
+            pauseAnimation();
+            currentHour = 0;
+            updateHourDisplay();
+        }
+
+        // Time slider event
+        document.getElementById('timeSlider').addEventListener('input', (e) => {
+            currentHour = parseInt(e.target.value);
+            updateHourDisplay();
+        });
+
+        // Initialize with default values
+        document.getElementById('lat').value = '30.3165';
+        document.getElementById('lon').value = '78.0322';
+
+        // Health check on load
+        fetch(`${API_BASE}/health`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('API Health:', data);
+            })
+            .catch(error => {
+                console.warn('API not available:', error);
+                showStatus('⚠️', 'API Unavailable', 'Backend server not running', 'error');
+            });
+    </script>
+</body>
+</html>

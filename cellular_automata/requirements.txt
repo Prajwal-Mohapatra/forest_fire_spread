@@ -1,10 +1,8 @@
 # ====================
 # CA Engine Requirements
 # ====================
-"""
-Required packages for the Cellular Automata fire simulation engine.
-Install with: pip install -r requirements.txt
-"""
+# Required packages for the Cellular Automata fire simulation engine.
+# Install with: pip install -r requirements.txt
 
 # Core scientific computing
 numpy>=1.21.0

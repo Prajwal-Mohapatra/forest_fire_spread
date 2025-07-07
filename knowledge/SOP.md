@@ -132,6 +132,20 @@ Read through the existing `knowledge` folder documentation thoroughly. Then anal
 remember, read entire files thoroughly — no truncation. Always process code from the first line to the last, never stopping arbitrarily (e.g., after 50 or 100 lines). Each read operation must cover at least 1000 lines, and continue beyond that if needed to cover the full file. Analyze all code elements: functions, classes, variables, imports/exports, and structure. Avoid phrases like "truncated for brevity" or "rest omitted" — these reflect incomplete work. Your analysis and suggestions must reflect full-file understanding, referencing and connecting code across the entire file to ensure accurate, contextual recommendations. Incomplete reads lead to poor results — thoroughness is non-negotiable.
 ```
 
+### **SOP-018: Project Analysis and Code Review**
+```
+I don't understand this project fully and in depth, so help me in that aspect, after analying this project, I will ask quesiton about different parts, and you will have to explain them in detail and depth, and also maintain a code review doc in knowledge, to keep track of all the questions and answer (short and summarize afterwards)
+
+Based on the code and our discussions, analyze the code, read through the existing `knowledge` folder documentation thoroughly in depth, and then we will go through code review
+```
+
+### **SOP-018: Project Analysis and Bug Fixing**
+```
+I am current in the phase of testing this project for any bugs, while running in production. Do the below, and understand the project in as depth as depth, to know how the bug is occuring and what needs to do to fix it, and also maintain a bug report doc in knowledge, to keep track of all the bugs and their fixes (short and summarize afterwards)
+
+Based on the code and our discussions, analyze the code, read through the existing `knowledge` folder documentation thoroughly in depth, and then we will go through bug fixing
+```
+
 ---
 
 ## Project-Specific SOPs for Forest Fire Prediction System

@@ -35,12 +35,24 @@ class MLCABridge:
             ca_output_dir: Directory for CA simulation outputs
         """
         
-        # Set default paths
+        # Set default paths - check multiple possible locations
         if ml_model_path is None:
-            ml_model_path = os.path.join(
-                project_root, 
-                "working_forest_fire_ml", "fire_pred_model", "outputs", "final_model.h5"
-            )
+            possible_model_paths = [
+                os.path.join(project_root, "working_forest_fire_ml", "fire_pred_model", "outputs", "final_model.h5"),
+                os.path.join(project_root, "fire_prediction_model", "outputs", "checkpoints", "model_best.weights.h5"),
+                os.path.join(project_root, "fire_prediction_model", "outputs", "final_model.h5"),
+                os.path.join(project_root, "outputs", "final_model.h5")
+            ]
+            
+            ml_model_path = None
+            for path in possible_model_paths:
+                if os.path.exists(path):
+                    ml_model_path = path
+                    break
+            
+            # If no model found, use the first path as default (for error reporting)
+            if ml_model_path is None:
+                ml_model_path = possible_model_paths[0]
         
         if ca_output_dir is None:
             ca_output_dir = os.path.join(project_root, "cellular_automata", "outputs")
@@ -388,7 +400,7 @@ class MLCABridge:
             if create_synthetic_probability_map(prob_map_path, width=400, height=400):
                 scenario_name = f"synthetic_demo_{demo_location}_{demo_date}"
                 
-                results = self.run_ca_simulation(
+                ca_results = self.run_ca_simulation(
                     probability_map_path=prob_map_path,
                     ignition_points=ignition_points,
                     weather_params=weather_params,
@@ -396,7 +408,24 @@ class MLCABridge:
                     scenario_name=scenario_name
                 )
                 
-                return results
+                if ca_results:
+                    # Wrap in the expected complete results structure
+                    complete_results = {
+                        'pipeline_id': f"synthetic_demo_{demo_location}_{demo_date}_{datetime.now().strftime('%H%M%S')}",
+                        'input_data_path': 'synthetic',
+                        'probability_map_path': prob_map_path,
+                        'ml_model_path': 'synthetic',
+                        'ca_results': ca_results,
+                        'simulation_parameters': {
+                            'ignition_points': ignition_points,
+                            'weather_params': weather_params,
+                            'simulation_hours': 6
+                        },
+                        'created_at': datetime.now().isoformat()
+                    }
+                    return complete_results
+                else:
+                    return None
             
         except Exception as e:
             print(f"❌ Synthetic demo creation failed: {e}")

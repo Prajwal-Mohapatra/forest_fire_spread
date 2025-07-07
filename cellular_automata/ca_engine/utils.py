@@ -15,20 +15,38 @@ import os
 from datetime import datetime, timedelta
 import json
 
+# Global variable to track GPU setup status
+_gpu_configured = False
+
 def setup_tensorflow_gpu():
     """Configure TensorFlow for optimal GPU usage."""
+    global _gpu_configured
+    
+    # Check if already configured
+    if _gpu_configured:
+        gpus = tf.config.experimental.list_physical_devices('GPU')
+        if gpus:
+            print(f"✅ GPU already configured: {len(gpus)} device(s) available")
+            return True
+        else:
+            print("⚠️ No GPU found, using CPU")
+            return False
+    
     gpus = tf.config.experimental.list_physical_devices('GPU')
     if gpus:
         try:
             for gpu in gpus:
                 tf.config.experimental.set_memory_growth(gpu, True)
             print(f"✅ GPU configured: {len(gpus)} device(s) available")
+            _gpu_configured = True
             return True
         except RuntimeError as e:
             print(f"⚠️ GPU setup failed: {e}")
+            _gpu_configured = True  # Mark as attempted to avoid repeated failures
             return False
     else:
         print("⚠️ No GPU found, using CPU")
+        _gpu_configured = True
         return False
 
 def load_probability_map(file_path: str) -> Tuple[np.ndarray, Dict]:
@@ -197,12 +215,19 @@ def create_ignition_points(grid_shape: Tuple[int, int],
     
     for lon, lat in ignition_coords:
         try:
+            # Validate coordinate ranges (approximate bounds for Uttarakhand)
+            if not (77.0 <= lon <= 82.0 and 28.0 <= lat <= 32.0):
+                print(f"⚠️ Ignition point ({lon:.4f}, {lat:.4f}) outside expected geographic bounds (Uttarakhand region)")
+                continue
+                
             row, col = geo_to_pixel(lon, lat, transform)
+            
+            # Validate pixel bounds
             if 0 <= row < grid_shape[0] and 0 <= col < grid_shape[1]:
                 ignition_mask[row, col] = 1.0
                 print(f"✅ Ignition point set at pixel ({row}, {col}) for coords ({lon:.4f}, {lat:.4f})")
             else:
-                print(f"⚠️ Ignition point ({lon:.4f}, {lat:.4f}) outside grid bounds")
+                print(f"⚠️ Ignition point ({lon:.4f}, {lat:.4f}) maps to pixel ({row}, {col}) outside grid bounds {grid_shape}")
         except Exception as e:
             print(f"⚠️ Failed to convert ignition point ({lon}, {lat}): {e}")
     

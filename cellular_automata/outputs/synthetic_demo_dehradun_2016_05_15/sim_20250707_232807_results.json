@@ -1,0 +1,78 @@
+{
+  "scenario_id": "sim_20250707_232807",
+  "metadata": {
+    "scenario_id": "sim_20250707_232807",
+    "created_at": "2025-07-07T23:28:07.825793",
+    "simulation_hours": 6,
+    "ignition_points": [
+      [
+        78.0322,
+        30.3165
+      ]
+    ],
+    "weather_parameters": {
+      "wind_direction": 225,
+      "wind_speed": 18,
+      "temperature": 32,
+      "relative_humidity": 35
+    },
+    "model_version": "1.0",
+    "resolution_meters": 30
+  },
+  "hourly_statistics": [
+    {
+      "total_burning_cells": 2,
+      "high_intensity_cells": 1,
+      "burned_area_km2": 0.0018,
+      "fire_perimeter_km": 0.06,
+      "max_intensity": 0.6792500019073486,
+      "mean_intensity": 5.914346274948912e-06,
+      "simulation_hour": 0
+    },
+    {
+      "total_burning_cells": 3,
+      "high_intensity_cells": 2,
+      "burned_area_km2": 0.0027,
+      "fire_perimeter_km": 0.09,
+      "max_intensity": 0.46138060092926025,
+      "mean_intensity": 6.012366156937787e-06,
+      "simulation_hour": 1
+    },
+    {
+      "total_burning_cells": 2,
+      "high_intensity_cells": 1,
+      "burned_area_km2": 0.0018,
+      "fire_perimeter_km": 0.06,
+      "max_intensity": 0.3133927881717682,
+      "mean_intensity": 3.7558040730800712e-06,
+      "simulation_hour": 2
+    },
+    {
+      "total_burning_cells": 1,
+      "high_intensity_cells": 0,
+      "burned_area_km2": 0.0009,
+      "fire_perimeter_km": 0.03,
+      "max_intensity": 0.21287205815315247,
+      "mean_intensity": 1.3304503454492078e-06,
+      "simulation_hour": 3
+    },
+    {
+      "total_burning_cells": 0,
+      "high_intensity_cells": 0,
+      "burned_area_km2": 0.0,
+      "fire_perimeter_km": 0.0,
+      "max_intensity": 0.0,
+      "mean_intensity": 0.0,
+      "simulation_hour": 4
+    }
+  ],
+  "frame_paths": [
+    "/home/swayam/projects/forest_fire_spread/cellular_automata/outputs/synthetic_demo_dehradun_2016_05_15/fire_spread_sim_20250707_232807_hour_00.tif",
+    "/home/swayam/projects/forest_fire_spread/cellular_automata/outputs/synthetic_demo_dehradun_2016_05_15/fire_spread_sim_20250707_232807_hour_01.tif",
+    "/home/swayam/projects/forest_fire_spread/cellular_automata/outputs/synthetic_demo_dehradun_2016_05_15/fire_spread_sim_20250707_232807_hour_02.tif",
+    "/home/swayam/projects/forest_fire_spread/cellular_automata/outputs/synthetic_demo_dehradun_2016_05_15/fire_spread_sim_20250707_232807_hour_03.tif",
+    "/home/swayam/projects/forest_fire_spread/cellular_automata/outputs/synthetic_demo_dehradun_2016_05_15/fire_spread_sim_20250707_232807_hour_04.tif",
+    "/home/swayam/projects/forest_fire_spread/cellular_automata/outputs/synthetic_demo_dehradun_2016_05_15/fire_spread_sim_20250707_232807_hour_05.tif"
+  ],
+  "total_hours_simulated": 5
+}

@@ -1,0 +1,88 @@
+{
+  "scenario_id": "sim_20250707_234709",
+  "metadata": {
+    "scenario_id": "sim_20250707_234709",
+    "created_at": "2025-07-07T23:47:09.503813",
+    "simulation_hours": 6,
+    "ignition_points": [
+      [
+        78.0322,
+        30.3165
+      ]
+    ],
+    "weather_parameters": {
+      "wind_direction": 225,
+      "wind_speed": 18,
+      "temperature": 32,
+      "relative_humidity": 35
+    },
+    "model_version": "1.0",
+    "resolution_meters": 30
+  },
+  "hourly_statistics": [
+    {
+      "total_burning_cells": 4,
+      "high_intensity_cells": 4,
+      "burned_area_km2": 0.0036,
+      "fire_perimeter_km": 0.12,
+      "max_intensity": 0.6877999901771545,
+      "mean_intensity": 1.5063862520037219e-05,
+      "simulation_hour": 0
+    },
+    {
+      "total_burning_cells": 5,
+      "high_intensity_cells": 5,
+      "burned_area_km2": 0.0045,
+      "fire_perimeter_km": 0.15,
+      "max_intensity": 0.6877999901771545,
+      "mean_intensity": 1.6589256119914353e-05,
+      "simulation_hour": 1
+    },
+    {
+      "total_burning_cells": 6,
+      "high_intensity_cells": 6,
+      "burned_area_km2": 0.0054,
+      "fire_perimeter_km": 0.18,
+      "max_intensity": 0.6877999901771545,
+      "mean_intensity": 1.832670568546746e-05,
+      "simulation_hour": 2
+    },
+    {
+      "total_burning_cells": 6,
+      "high_intensity_cells": 6,
+      "burned_area_km2": 0.0054,
+      "fire_perimeter_km": 0.18,
+      "max_intensity": 0.6877999901771545,
+      "mean_intensity": 1.7544381989864632e-05,
+      "simulation_hour": 3
+    },
+    {
+      "total_burning_cells": 6,
+      "high_intensity_cells": 4,
+      "burned_area_km2": 0.0054,
+      "fire_perimeter_km": 0.18,
+      "max_intensity": 0.6877999901771545,
+      "mean_intensity": 1.6075811799964868e-05,
+      "simulation_hour": 4
+    },
+    {
+      "total_burning_cells": 5,
+      "high_intensity_cells": 4,
+      "burned_area_km2": 0.0045,
+      "fire_perimeter_km": 0.15,
+      "max_intensity": 0.6026202440261841,
+      "mean_intensity": 1.3848352864442859e-05,
+      "simulation_hour": 5
+    }
+  ],
+  "frame_paths": [
+    "/home/swayam/projects/forest_fire_spread/cellular_automata/outputs/synthetic_demo_dehradun_2016_05_15/fire_spread_sim_20250707_234709_hour_00.tif",
+    "/home/swayam/projects/forest_fire_spread/cellular_automata/outputs/synthetic_demo_dehradun_2016_05_15/fire_spread_sim_20250707_234709_hour_01.tif",
+    "/home/swayam/projects/forest_fire_spread/cellular_automata/outputs/synthetic_demo_dehradun_2016_05_15/fire_spread_sim_20250707_234709_hour_02.tif",
+    "/home/swayam/projects/forest_fire_spread/cellular_automata/outputs/synthetic_demo_dehradun_2016_05_15/fire_spread_sim_20250707_234709_hour_03.tif",
+    "/home/swayam/projects/forest_fire_spread/cellular_automata/outputs/synthetic_demo_dehradun_2016_05_15/fire_spread_sim_20250707_234709_hour_04.tif",
+    "/home/swayam/projects/forest_fire_spread/cellular_automata/outputs/synthetic_demo_dehradun_2016_05_15/fire_spread_sim_20250707_234709_hour_05.tif",
+    "/home/swayam/projects/forest_fire_spread/cellular_automata/outputs/synthetic_demo_dehradun_2016_05_15/fire_spread_sim_20250707_234709_hour_06.tif"
+  ],
+  "total_hours_simulated": 6
+}

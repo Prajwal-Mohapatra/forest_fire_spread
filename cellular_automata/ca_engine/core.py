@@ -246,6 +246,9 @@ class ForestFireCA:
                 print(f"🔥 Fire extinguished at hour {hour}")
                 break
         
+        # Add total hours simulated to results before saving/returning
+        results['total_hours_simulated'] = len(results['hourly_statistics'])
+        
         # Save complete results
         results_path = os.path.join(output_dir, f"{scenario_id}_results.json")
         
@@ -255,7 +258,7 @@ class ForestFireCA:
             'metadata': results['metadata'],
             'hourly_statistics': results['hourly_statistics'],
             'frame_paths': results['frame_paths'],
-            'total_hours_simulated': len(results['hourly_statistics'])
+            'total_hours_simulated': results['total_hours_simulated']
         }
         
         with open(results_path, 'w') as f:

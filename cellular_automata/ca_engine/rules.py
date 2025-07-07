@@ -337,3 +337,122 @@ class FireSpreadRules:
         return stats
 
 print("✅ Fire spread rules module loaded successfully")
+
+class SimplifiedFireRules:
+    """
+    Simplified fire spread rules for rapid prototyping (from duplicate folder)
+    Enhanced with numpy-based operations for faster development iterations
+    """
+    
+    def __init__(self, config_dict: Dict = None):
+        # Use basic configuration if none provided
+        self.config = {
+            'base_spread_rate': 0.1,
+            'wind_influence': 0.3,
+            'slope_influence': 0.2,
+            'fuel_influence': 0.4
+        }
+        if config_dict:
+            self.config.update(config_dict)
+    
+    def simple_spread(self,
+                     fire_state: np.ndarray,
+                     probability_map: np.ndarray,
+                     wind_direction: float = 0.0,
+                     wind_speed: float = 10.0) -> np.ndarray:
+        """
+        Simple fire spread using numpy operations
+        
+        Args:
+            fire_state: Current fire state
+            probability_map: Fire probability map
+            wind_direction: Wind direction in degrees
+            wind_speed: Wind speed in km/h
+            
+        Returns:
+            Updated fire state
+        """
+        from scipy import ndimage
+        
+        # Create simple kernel with wind bias
+        kernel = self._create_wind_biased_kernel(wind_direction, wind_speed)
+        
+        # Calculate neighbor influence
+        neighbor_influence = ndimage.convolve(fire_state, kernel, mode='constant')
+        
+        # Combine with probability map
+        spread_probability = (
+            self.config['base_spread_rate'] * 
+            probability_map * 
+            (1.0 + neighbor_influence)
+        )
+        
+        # Apply stochastic spread
+        random_values = np.random.random(fire_state.shape)
+        new_ignitions = (random_values < spread_probability).astype(np.float32)
+        
+        # Keep existing fire and add new ignitions
+        new_state = np.maximum(fire_state, new_ignitions)
+        
+        return new_state
+    
+    def _create_wind_biased_kernel(self, wind_direction: float, wind_speed: float) -> np.ndarray:
+        """Create wind-biased convolution kernel"""
+        
+        # Base kernel
+        kernel = np.array([
+            [0.1, 0.2, 0.1],
+            [0.2, 0.0, 0.2],
+            [0.1, 0.2, 0.1]
+        ])
+        
+        # Apply wind bias (simplified)
+        wind_factor = min(wind_speed / 20.0, 1.0) * self.config['wind_influence']
+        
+        # Adjust kernel based on wind direction quadrant
+        if 0 <= wind_direction < 90:  # NE quadrant
+            kernel[0, 2] *= (1.0 + wind_factor)  # Boost NE
+            kernel[2, 0] *= (1.0 - wind_factor * 0.5)  # Reduce SW
+        elif 90 <= wind_direction < 180:  # SE quadrant
+            kernel[2, 2] *= (1.0 + wind_factor)  # Boost SE
+            kernel[0, 0] *= (1.0 - wind_factor * 0.5)  # Reduce NW
+        elif 180 <= wind_direction < 270:  # SW quadrant
+            kernel[2, 0] *= (1.0 + wind_factor)  # Boost SW
+            kernel[0, 2] *= (1.0 - wind_factor * 0.5)  # Reduce NE
+        else:  # NW quadrant
+            kernel[0, 0] *= (1.0 + wind_factor)  # Boost NW
+            kernel[2, 2] *= (1.0 - wind_factor * 0.5)  # Reduce SE
+        
+        return kernel
+    
+    def apply_lulc_effects(self, 
+                          fire_state: np.ndarray,
+                          lulc_map: np.ndarray,
+                          lulc_behavior: Dict = None) -> np.ndarray:
+        """
+        Apply land use/land cover effects to fire spread
+        
+        Args:
+            fire_state: Current fire state
+            lulc_map: Land use land cover map
+            lulc_behavior: LULC fire behavior dictionary
+            
+        Returns:
+            Modified fire state with LULC effects
+        """
+        if lulc_behavior is None:
+            # Use default from config if available
+            from .config import LULC_FIRE_BEHAVIOR
+            lulc_behavior = LULC_FIRE_BEHAVIOR
+        
+        # Create flammability map
+        flammability_map = np.ones_like(fire_state)
+        
+        for lulc_class, behavior in lulc_behavior.items():
+            mask = (lulc_map == lulc_class)
+            flammability_map[mask] = behavior['flammability']
+        
+        # Apply flammability effects
+        modified_state = fire_state * flammability_map
+        
+        return modified_state

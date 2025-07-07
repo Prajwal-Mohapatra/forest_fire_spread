@@ -35,6 +35,14 @@ os.makedirs(app.config['OUTPUT_FOLDER'], exist_ok=True)
 # Store active simulations
 active_simulations = {}
 
+# Import enhanced integration from the migrated CA system
+try:
+    from integration.ml_ca_bridge import MLCABridge
+    ML_BRIDGE_AVAILABLE = True
+except ImportError:
+    print("⚠️ MLCABridge not available, using fallback simulation")
+    ML_BRIDGE_AVAILABLE = False
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint."""
@@ -213,154 +221,271 @@ def get_simulation_animation(simulation_id):
 @app.route('/api/available_dates', methods=['GET'])
 def get_available_dates():
     """Get list of dates with available ML predictions."""
-    # For demo purposes, return a fixed list of dates
-    # In full implementation, this would scan the actual data directory
-    available_dates = [
-        '2016-04-01', '2016-04-15', '2016-05-01', 
-        '2016-05-15', '2016-05-20', '2016-05-25'
-    ]
+    # Enhanced version with better formatting from duplicate
+    try:
+        if ML_BRIDGE_AVAILABLE:
+            bridge = MLCABridge()
+            dates = bridge.get_available_dates()
+        else:
+            # Fallback list for demo
+            dates = ['2016_04_01', '2016_04_15', '2016_05_01', 
+                    '2016_05_15', '2016_05_20', '2016_05_25']
+        
+        # Convert to more readable format (from duplicate folder)
+        formatted_dates = []
+        for date_str in dates:
+            try:
+                # Convert 2016_04_15 to readable format
+                year, month, day = date_str.split('_')
+                date_obj = datetime(int(year), int(month), int(day))
+                formatted_dates.append({
+                    'value': date_str,
+                    'label': date_obj.strftime('%B %d, %Y'),
+                    'iso': date_obj.isoformat(),
+                    'short': date_obj.strftime('%m/%d/%Y')
+                })
+            except:
+                # If parsing fails, use original format
+                formatted_dates.append({
+                    'value': date_str,
+                    'label': date_str.replace('_', '-'),
+                    'iso': date_str,
+                    'short': date_str
+                })
+        
+        return jsonify({
+            'available_dates': formatted_dates,
+            'date_range': {
+                'start': '2016-04-01',
+                'end': '2016-05-29'
+            },
+            'total_count': len(formatted_dates)
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/simulation-cache/<simulation_id>', methods=['GET'])
+def get_simulation_cache(simulation_id):
+    """Get cached simulation results (from duplicate folder)."""
+    if simulation_id not in active_simulations:
+        return jsonify({'error': 'Simulation not found'}), 404
+    
+    sim_info = active_simulations[simulation_id]
+    
+    # Create cache-friendly response
+    cached_data = {
+        'simulation_id': simulation_id,
+        'status': sim_info['status'],
+        'parameters': sim_info.get('parameters', {}),
+        'started_at': sim_info.get('started_at'),
+        'completed_at': sim_info.get('completed_at'),
+        'results_summary': None
+    }
+    
+    if sim_info['status'] == 'completed' and sim_info.get('results'):
+        results = sim_info['results']
+        cached_data['results_summary'] = {
+            'total_hours': results.get('total_hours_simulated'),
+            'scenario_id': results.get('scenario_id'),
+            'frame_count': len(results.get('frame_paths', [])),
+            'final_statistics': results.get('hourly_statistics', [])[-1] if results.get('hourly_statistics') else None
+        }
     
     return jsonify({
-        'available_dates': available_dates,
-        'date_range': {
-            'start': '2016-04-01',
-            'end': '2016-05-29'
+        'success': True,
+        'cached_data': cached_data
+    })
+
+@app.route('/api/multiple-scenarios', methods=['POST'])
+def run_multiple_scenarios():
+    """Run multiple fire scenarios for comparison (from duplicate folder)."""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['scenarios']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'error': f'Missing required field: {field}'}), 400
+        
+        scenarios = data['scenarios']
+        base_weather = data.get('weather_params', {
+            'wind_direction': 45,
+            'wind_speed': 15,
+            'temperature': 30,
+            'relative_humidity': 40
+        })
+        
+        # Validate scenarios format
+        for i, scenario in enumerate(scenarios):
+            if 'ignition_points' not in scenario:
+                return jsonify({'error': f'Scenario {i+1} missing ignition_points'}), 400
+        
+        print(f"🎭 Running {len(scenarios)} scenarios for comparison")
+        
+        scenario_results = {}
+        
+        for i, scenario_config in enumerate(scenarios):
+            scenario_id = f"comparison_{i+1}_{datetime.now().strftime('%H%M%S')}"
+            
+            # Use scenario-specific weather or base weather
+            weather_params = scenario_config.get('weather_params', base_weather)
+            ignition_points = scenario_config['ignition_points']
+            simulation_hours = scenario_config.get('simulation_hours', 6)
+            
+            # Run individual scenario
+            results = run_synthetic_simulation(
+                ignition_points, weather_params, simulation_hours, scenario_id
+            )
+            
+            if results:
+                scenario_results[f"scenario_{i+1}"] = {
+                    'config': scenario_config,
+                    'results': results,
+                    'scenario_id': scenario_id
+                }
+        
+        # Create comparison summary
+        comparison_summary = {
+            'total_scenarios': len(scenario_results),
+            'scenario_comparison': []
+        }
+        
+        for scenario_id, scenario_data in scenario_results.items():
+            stats = scenario_data['results'].get('hourly_statistics', [])
+            final_stats = stats[-1] if stats else {}
+            
+            scenario_summary = {
+                'scenario_id': scenario_id,
+                'total_burned_area_km2': final_stats.get('burned_area_km2', 0),
+                'max_fire_intensity': final_stats.get('max_intensity', 0),
+                'total_burning_cells': final_stats.get('total_burning_cells', 0),
+                'ignition_points_count': len(scenario_data['config']['ignition_points'])
+            }
+            comparison_summary['scenario_comparison'].append(scenario_summary)
+        
+        return jsonify({
+            'success': True,
+            'scenarios': scenario_results,
+            'summary': comparison_summary,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        print(f"❌ Multiple scenarios failed: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/config', methods=['GET'])
+def get_api_config():
+    """Get API configuration for frontend (from duplicate folder)."""
+    return jsonify({
+        'api_version': '1.0.0',
+        'max_simulation_hours': 24,
+        'max_ignition_points': 10,
+        'supported_formats': ['GeoTIFF', 'JSON'],
+        'default_weather': {
+            'wind_speed': 15.0,
+            'wind_direction': 45.0,
+            'temperature': 30.0,
+            'relative_humidity': 40.0
+        },
+        'resolution_meters': 30,
+        'coordinate_system': 'Geographic (WGS84)',
+        'demo_scenarios': [
+            'dehradun_fire', 'rishikesh_fire', 'nainital_fire'
+        ],
+        'features': {
+            'ml_prediction': ML_BRIDGE_AVAILABLE,
+            'synthetic_simulation': True,
+            'multiple_scenarios': True,
+            'animation_export': True,
+            'real_time_stats': True
         }
     })
 
-@app.route('/api/demo/scenarios', methods=['GET'])
-def get_demo_scenarios():
-    """Get predefined demo scenarios."""
-    demo_scenarios = [
-        {
-            'id': 'dehradun_fire',
-            'name': 'Dehradun Valley Fire',
-            'date': '2016-05-15',
-            'location': 'Dehradun',
-            'ignition_points': [[78.0322, 30.3165]],
-            'weather': {
-                'wind_direction': 225,
-                'wind_speed': 18,
-                'temperature': 32,
-                'relative_humidity': 35
-            },
-            'description': 'Simulated fire spread in Dehradun valley during hot, dry conditions'
-        },
-        {
-            'id': 'rishikesh_fire',
-            'name': 'Rishikesh Forest Fire',
-            'date': '2016-05-20',
-            'location': 'Rishikesh',
-            'ignition_points': [[78.2676, 30.0869]],
-            'weather': {
-                'wind_direction': 45,
-                'wind_speed': 22,
-                'temperature': 35,
-                'relative_humidity': 25
-            },
-            'description': 'Forest fire near Rishikesh with northeast winds'
-        },
-        {
-            'id': 'nainital_fire',
-            'name': 'Nainital Hill Fire',
-            'date': '2016-05-25',
-            'location': 'Nainital',
-            'ignition_points': [[79.4633, 29.3803]],
-            'weather': {
-                'wind_direction': 180,
-                'wind_speed': 12,
-                'temperature': 28,
-                'relative_humidity': 45
-            },
-            'description': 'Hill fire in Nainital region with moderate conditions'
-        }
-    ]
-    
-    return jsonify({'demo_scenarios': demo_scenarios})
-
-@app.route('/api/demo/run/<scenario_id>', methods=['POST'])
-def run_demo_scenario(scenario_id):
-    """Run a predefined demo scenario."""
-    demo_scenarios = {
-        'dehradun_fire': {
-            'ignition_points': [[78.0322, 30.3165]],
-            'weather_params': {
-                'wind_direction': 225,
-                'wind_speed': 18,
-                'temperature': 32,
-                'relative_humidity': 35
-            },
-            'date': '2016-05-15'
-        },
-        'rishikesh_fire': {
-            'ignition_points': [[78.2676, 30.0869]],
-            'weather_params': {
-                'wind_direction': 45,
-                'wind_speed': 22,
-                'temperature': 35,
-                'relative_humidity': 25
-            },
-            'date': '2016-05-20'
-        },
-        'nainital_fire': {
-            'ignition_points': [[79.4633, 29.3803]],
-            'weather_params': {
-                'wind_direction': 180,
-                'wind_speed': 12,
-                'temperature': 28,
-                'relative_humidity': 45
-            },
-            'date': '2016-05-25'
-        }
-    }
-    
-    if scenario_id not in demo_scenarios:
-        return jsonify({'error': 'Demo scenario not found'}), 404
-    
-    scenario = demo_scenarios[scenario_id]
-    
-    # Add default parameters
-    scenario['simulation_hours'] = 6
-    scenario['use_ml_prediction'] = False  # Use synthetic for demo
-    
-    # Run simulation using the main simulation endpoint
-    return run_simulation_with_data(scenario)
-
-def run_simulation_with_data(data):
-    """Helper function to run simulation with provided data."""
+@app.route('/api/export-results/<simulation_id>', methods=['GET'])
+def export_simulation_results(simulation_id):
+    """Export simulation results as downloadable file (from duplicate folder)."""
     try:
-        ignition_points = data['ignition_points']
-        weather_params = data['weather_params']
-        simulation_hours = data.get('simulation_hours', 6)
+        if simulation_id not in active_simulations:
+            return jsonify({'error': 'Simulation not found'}), 404
         
-        # Generate unique simulation ID
-        simulation_id = str(uuid.uuid4())[:8]
+        sim_info = active_simulations[simulation_id]
         
-        # Run synthetic simulation for demo
-        results = run_synthetic_simulation(
-            ignition_points, weather_params, simulation_hours, simulation_id
-        )
+        if sim_info['status'] != 'completed':
+            return jsonify({'error': 'Simulation not completed'}), 400
         
-        if results:
-            return jsonify({
+        results = sim_info.get('results')
+        if not results:
+            return jsonify({'error': 'No results available'}), 404
+        
+        # Create export package
+        export_data = {
+            'simulation_metadata': {
                 'simulation_id': simulation_id,
-                'status': 'completed',
-                'results': {
-                    'scenario_id': results.get('scenario_id'),
-                    'total_hours': results.get('total_hours_simulated'),
-                    'frame_paths': results.get('frame_paths', []),
-                    'statistics': results.get('hourly_statistics', [])
-                }
-            })
-        else:
-            return jsonify({
-                'simulation_id': simulation_id,
-                'status': 'failed',
-                'error': 'Demo simulation failed'
-            }), 500
-            
+                'scenario_id': results.get('scenario_id'),
+                'created_at': sim_info.get('started_at'),
+                'completed_at': sim_info.get('completed_at'),
+                'parameters': sim_info.get('parameters', {})
+            },
+            'simulation_results': {
+                'total_hours_simulated': results.get('total_hours_simulated'),
+                'hourly_statistics': results.get('hourly_statistics', []),
+                'frame_count': len(results.get('frame_paths', []))
+            },
+            'export_info': {
+                'exported_at': datetime.now().isoformat(),
+                'format': 'JSON',
+                'version': '1.0.0'
+            }
+        }
+        
+        # For now, return JSON. In full implementation, create ZIP with GeoTIFFs
+        return jsonify({
+            'success': True,
+            'export_format': 'JSON',
+            'export_data': export_data,
+            'download_url': f'/api/simulation/{simulation_id}/download'
+        })
+        
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# Utility functions for the API
+
+def validate_coordinates(x, y, max_x=400, max_y=400):
+    """Validate ignition point coordinates (from duplicate folder)."""
+    if not (0 <= x < max_x and 0 <= y < max_y):
+        raise ValueError(f"Coordinates ({x}, {y}) out of bounds. Max: ({max_x}, {max_y})")
+    return True
+
+def cache_simulation_results(simulation_id, results):
+    """Cache simulation results for faster retrieval (from duplicate folder)."""
+    try:
+        cache_dir = os.path.join(app.config['OUTPUT_FOLDER'], 'cache')
+        os.makedirs(cache_dir, exist_ok=True)
+        cache_path = os.path.join(cache_dir, f"simulation_{simulation_id}.json")
+        
+        # Create cache-friendly data structure
+        cache_data = {
+            'simulation_id': simulation_id,
+            'cached_at': datetime.now().isoformat(),
+            'results_summary': {
+                'scenario_id': results.get('scenario_id'),
+                'total_hours': results.get('total_hours_simulated'),
+                'frame_count': len(results.get('frame_paths', [])),
+                'statistics': results.get('hourly_statistics', [])
+            }
+        }
+        
+        with open(cache_path, 'w') as f:
+            json.dump(cache_data, f, indent=2)
+        
+        print(f"💾 Cached simulation results for {simulation_id}")
+        
+    except Exception as e:
+        print(f"⚠️ Failed to cache results: {str(e)}")
 
 def run_ml_ca_simulation(ignition_points, weather_params, simulation_hours, date, simulation_id):
     """Run simulation using ML predictions."""

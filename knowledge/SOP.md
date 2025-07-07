@@ -96,7 +96,7 @@ How can I apply these to my current project?
 
 ### **SOP-014: Git Commit Messages**
 ```
-Analyze the project fully, and based on the following code changes and our previous, generate a very "short", clear and informative git commit message
+Analyze the project fully, and based on the following code changes and our previous conversation, generate a very "short", clear and informative git commit message
 ```
 
 ### **SOP-015: Merge Conflict Resolution**
@@ -115,7 +115,19 @@ Based on the code and our discussions, analyze the code again, in detail, genera
 - if any particular documentation is already present, then add onto it, in as much detail as possible
 ```
 
-### **SOP-015: Read files without lazing around**
+### **SOP-017: Knowledge Base Update**
+```
+Read through the existing `knowledge` folder documentation thoroughly. Then analyze the current project state and add/update the following:
+- Document any new components, files, or features added since last update
+- Update progress report with recent developments and current status
+- Add documentation for any code changes, bug fixes, or improvements
+- Update integration points and architecture changes
+- Record any new decisions, conclusions, or learnings
+- Ensure all existing documentation reflects current project state
+- Add timestamps to track documentation freshness
+```
+
+### **SOP-018: Read files without lazing around**
 ```
 remember, read entire files thoroughly — no truncation. Always process code from the first line to the last, never stopping arbitrarily (e.g., after 50 or 100 lines). Each read operation must cover at least 1000 lines, and continue beyond that if needed to cover the full file. Analyze all code elements: functions, classes, variables, imports/exports, and structure. Avoid phrases like "truncated for brevity" or "rest omitted" — these reflect incomplete work. Your analysis and suggestions must reflect full-file understanding, referencing and connecting code across the entire file to ensure accurate, contextual recommendations. Incomplete reads lead to poor results — thoroughness is non-negotiable.
 ```
@@ -314,6 +326,8 @@ When working with Claude on the forest fire project, establish context with:
 
 [Paste your specific context management need here]
 ```
+
+
 ---
 
 ## Usage Guidelines

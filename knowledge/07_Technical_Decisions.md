@@ -492,3 +492,205 @@ tests/
 ---
 
 **Decision Summary**: The technical decisions reflect a balance between research requirements (accuracy, innovation, presentation quality) and practical considerations (performance, maintainability, usability). The architecture is designed to be modular, well-documented, and suitable for both demonstration and future operational use.
+
+## Architecture Consolidation Decisions (July 2025)
+
+### 18. Code Duplication Resolution Strategy
+
+**Decision**: Systematically identify and eliminate duplicate implementations while preserving all valuable functionality.
+
+**Rationale**:
+- **Maintenance Burden**: Multiple implementations of the same functionality increase maintenance complexity
+- **Code Quality**: Duplicate code leads to inconsistencies and potential bugs
+- **Development Efficiency**: Single source of truth reduces confusion and improves development velocity
+- **Architecture Clarity**: Clean separation of concerns improves system understanding
+
+**Implementation Strategy**:
+```python
+# Analysis approach
+1. Complete file-by-file analysis (no code truncation)
+2. Line-by-line comparison of implementations
+3. Feature identification and categorization
+4. Strategic migration planning
+5. Quality assurance and validation
+```
+
+**Duplications Identified and Resolved**:
+1. **Cellular Automata**: `cellular_automata/` vs `working_forest_fire_ml/fire_pred_model/cellular_automata/`
+2. **Web Interface**: `cellular_automata/web_interface/` vs `web_api/` + `web_frontend/`
+
+**Alternatives Considered**:
+- Keep both implementations with different purposes
+- Create wrapper layer to unify interfaces
+- Choose one implementation and discard the other
+
+**Trade-offs**:
+- ✅ **Pros**: Reduced complexity, better maintainability, enhanced functionality
+- ❌ **Cons**: One-time migration effort, risk of losing functionality
+
+### 19. Feature Migration Over Replacement
+
+**Decision**: Migrate valuable features from duplicate implementations rather than simple replacement.
+
+**Rationale**:
+- **Feature Preservation**: Ensure no valuable functionality is lost
+- **Best of Both Worlds**: Combine advantages of different implementations
+- **Quality Improvement**: Opportunity to improve and enhance existing implementations
+- **Risk Mitigation**: Avoid losing working functionality
+
+**Migration Examples**:
+
+#### Cellular Automata Enhancements
+```python
+# From duplicate: Dataclass-based configuration
+@dataclass
+class AdvancedCAConfig:
+    resolution: float = 30.0
+    use_gpu: bool = True
+    wind_effect_strength: float = 0.3
+
+# From duplicate: GPU-accelerated utilities
+def calculate_slope_and_aspect_tf(dem_array):
+    """TensorFlow-based slope calculation"""
+    dem_tensor = tf.constant(dem_array, dtype=tf.float32)
+    # GPU-accelerated implementation
+```
+
+#### Web Interface Enhancements
+```python
+# From duplicate: Enhanced API endpoints
+@app.route('/api/multiple-scenarios', methods=['POST'])
+def run_multiple_scenarios():
+    """Compare multiple fire scenarios"""
+
+# From duplicate: Enhanced date formatting
+{
+    'value': '2016_04_15',
+    'label': 'April 15, 2016',
+    'iso': '2016-04-15T00:00:00',
+    'short': '04/15/2016'
+}
+```
+
+**Validation Process**:
+1. Complete analysis of all code (no truncation)
+2. Feature mapping and categorization
+3. Migration with preservation of all functionality
+4. Quality assurance and testing
+5. Documentation of changes
+
+**Trade-offs**:
+- ✅ **Pros**: No functionality loss, enhanced capabilities, improved quality
+- ❌ **Cons**: More complex migration process, thorough testing required
+
+### 20. Comprehensive Documentation Strategy
+
+**Decision**: Create detailed migration documentation with complete analysis records.
+
+**Rationale**:
+- **Knowledge Preservation**: Record decisions and rationale for future reference
+- **Quality Assurance**: Document validation that no functionality was lost
+- **Team Communication**: Clear communication of changes and new capabilities
+- **Maintenance Support**: Enable future developers to understand architecture decisions
+
+**Documentation Artifacts Created**:
+1. **CA_DUPLICATION_RESOLUTION.md**: Complete cellular automata consolidation analysis
+2. **WEB_DUPLICATION_RESOLUTION.md**: Web interface migration summary
+3. **REACT_INTEGRATION_GUIDE.md**: Production-ready frontend development guide
+4. **MIGRATION_SUMMARY.md**: Technical migration details
+
+**Documentation Standards**:
+- Complete code analysis records (no truncation mentioned)
+- Before/after comparisons with code examples
+- Benefits achieved and trade-offs made
+- New capabilities and usage examples
+- Quality assurance validation records
+
+**Alternatives Considered**:
+- Minimal documentation (change log only)
+- Code comments only
+- Wiki-based documentation
+
+**Trade-offs**:
+- ✅ **Pros**: Complete knowledge preservation, team understanding, future reference
+- ❌ **Cons**: Documentation maintenance overhead, time investment
+
+### 21. Type Safety and Modern Python Practices
+
+**Decision**: Enhance codebase with modern Python practices including dataclasses and type hints.
+
+**Rationale**:
+- **Code Quality**: Type hints improve code reliability and IDE support
+- **Development Experience**: Better autocomplete and error detection
+- **Maintainability**: Self-documenting code with clear interfaces
+- **Future-Proofing**: Align with modern Python best practices
+
+**Implementation Examples**:
+```python
+# Enhanced configuration with dataclasses
+@dataclass
+class AdvancedCAConfig:
+    resolution: float = 30.0
+    simulation_hours: int = 6
+    use_gpu: bool = True
+    lulc_fire_behavior: Dict[int, Dict[str, float]] = None
+
+# Type-hinted utility functions
+def calculate_slope_and_aspect_tf(dem_array: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """GPU-accelerated slope and aspect calculation"""
+    # Implementation with proper type annotations
+
+def resize_array_tf(array: np.ndarray, target_shape: Tuple[int, int], 
+                   method: str = 'bilinear') -> np.ndarray:
+    """TensorFlow-based array resizing"""
+    # Type-safe implementation
+```
+
+**Benefits Achieved**:
+- Improved IDE support and developer experience
+- Better error detection at development time
+- Self-documenting code interfaces
+- Compatibility with modern Python tooling
+
+**Trade-offs**:
+- ✅ **Pros**: Better code quality, developer experience, maintainability
+- ❌ **Cons**: Additional syntax, potential compatibility considerations
+
+### 22. Modular Enhancement Strategy
+
+**Decision**: Add new functionality as optional enhancements rather than replacements.
+
+**Rationale**:
+- **Backward Compatibility**: Preserve existing functionality and workflows
+- **Gradual Adoption**: Allow users to adopt new features at their own pace
+- **Risk Mitigation**: Reduce risk of breaking existing integrations
+- **Flexibility**: Provide options for different use cases
+
+**Enhancement Examples**:
+```python
+# Existing functionality preserved
+config = CAConfig()  # Original configuration still works
+
+# New functionality available as option
+advanced_config = AdvancedCAConfig(use_gpu=True)  # Enhanced version available
+
+# Existing rules continue to work
+fire_rules = FireSpreadRules()  # Production rules
+
+# New rules available for prototyping  
+simple_rules = SimplifiedFireRules()  # Rapid prototyping option
+```
+
+**Implementation Pattern**:
+- Preserve all existing interfaces
+- Add new interfaces as additional options
+- Clear naming to distinguish enhancement levels
+- Comprehensive documentation for both approaches
+
+**Trade-offs**:
+- ✅ **Pros**: No breaking changes, flexibility, smooth migration path
+- ❌ **Cons**: Slightly more complex API surface, potential confusion about which to use
+
+---
+
+**Architecture Consolidation Summary**: The July 2025 consolidation phase successfully eliminated code duplication while enhancing functionality, improving type safety, and maintaining backward compatibility. The systematic approach ensured no valuable functionality was lost while significantly improving code quality and maintainability.

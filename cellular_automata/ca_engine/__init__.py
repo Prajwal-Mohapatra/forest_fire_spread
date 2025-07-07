@@ -32,12 +32,15 @@ Usage:
 """
 
 from .core import ForestFireCA, run_quick_simulation
-from .rules import FireSpreadRules
+from .rules import FireSpreadRules, SimplifiedFireRules
 from .utils import (
     setup_tensorflow_gpu, 
     load_probability_map, 
     create_ignition_points,
-    save_simulation_frame
+    save_simulation_frame,
+    calculate_slope_and_aspect_tf,
+    resize_array_tf,
+    create_fire_animation_data
 )
 from . import config
 
@@ -49,11 +52,15 @@ __all__ = [
     "ForestFireCA",
     "run_quick_simulation", 
     "FireSpreadRules",
+    "SimplifiedFireRules",
     "config",
     "setup_tensorflow_gpu",
     "load_probability_map",
     "create_ignition_points",
-    "save_simulation_frame"
+    "save_simulation_frame",
+    "calculate_slope_and_aspect_tf",
+    "resize_array_tf",
+    "create_fire_animation_data"
 ]
 
 # Configuration check

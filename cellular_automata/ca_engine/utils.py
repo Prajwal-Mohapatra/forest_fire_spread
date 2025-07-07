@@ -288,4 +288,90 @@ def calculate_fire_intensity(probability: float, fuel_load: float, wind_speed: f
     wind_boost = 1.0 + (wind_speed / 50.0) * 0.5  # Max 25% boost from wind
     return np.clip(base_intensity * wind_boost, 0.0, 1.0)
 
+def calculate_slope_and_aspect_tf(dem: np.ndarray, resolution: float = 30.0) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Calculate slope and aspect from DEM using TensorFlow (enhanced from duplicate folder)
+    
+    Args:
+        dem: Digital elevation model
+        resolution: Pixel resolution in meters
+        
+    Returns:
+        Tuple of (slope_degrees, aspect_degrees)
+    """
+    # Convert to TensorFlow tensor
+    dem_tf = tf.constant(dem, dtype=tf.float32)
+    dem_tf = dem_tf[tf.newaxis, :, :, tf.newaxis]  # Add batch and channel dims
+    
+    # Calculate gradients
+    grad_y, grad_x = tf.image.image_gradients(dem_tf)
+    
+    # Remove extra dimensions
+    grad_x = grad_x[0, :, :, 0] / resolution
+    grad_y = grad_y[0, :, :, 0] / resolution
+    
+    # Calculate slope in radians then convert to degrees
+    slope_rad = tf.atan(tf.sqrt(grad_x**2 + grad_y**2))
+    slope_deg = slope_rad * 180.0 / np.pi
+    
+    # Calculate aspect (direction of steepest descent)
+    aspect_rad = tf.atan2(-grad_y, -grad_x)  # Negative for geographic convention
+    aspect_deg = aspect_rad * 180.0 / np.pi
+    
+    # Convert aspect to 0-360 range
+    aspect_deg = tf.where(aspect_deg < 0, aspect_deg + 360, aspect_deg)
+    
+    return slope_deg.numpy(), aspect_deg.numpy()
+
+def resize_array_tf(array: np.ndarray, target_shape: Tuple[int, int]) -> np.ndarray:
+    """
+    Resize array using TensorFlow for GPU acceleration (from duplicate folder)
+    
+    Args:
+        array: Input array to resize
+        target_shape: Target (height, width)
+        
+    Returns:
+        Resized array
+    """
+    if array.shape == target_shape:
+        return array
+        
+    # Use TensorFlow for resizing
+    tf_array = tf.constant(array[np.newaxis, :, :, np.newaxis])
+    resized = tf.image.resize(tf_array, target_shape, method='bilinear')
+    return resized[0, :, :, 0].numpy()
+
+def create_fire_animation_data(simulation_frames: List[np.ndarray], 
+                              metadata: Dict) -> Dict:
+    """
+    Prepare data for web animation (from duplicate folder)
+    
+    Args:
+        simulation_frames: List of fire state arrays
+        metadata: Geospatial metadata
+        
+    Returns:
+        Dictionary with animation data
+    """
+    animation_data = {
+        'frames': [],
+        'bounds': metadata.get('bounds'),
+        'shape': simulation_frames[0].shape if simulation_frames else None,
+        'frame_count': len(simulation_frames)
+    }
+    
+    for i, frame in enumerate(simulation_frames):
+        # Convert to format suitable for web display
+        frame_data = {
+            'time_step': i,
+            'fire_pixels': np.where(frame > 0.1),  # Locations with fire
+            'fire_intensity': frame[frame > 0.1].tolist(),  # Intensity values
+            'max_intensity': float(np.max(frame)),
+            'total_burned_area': float(np.sum(frame > 0.1))  # Number of burning pixels
+        }
+        animation_data['frames'].append(frame_data)
+    
+    return animation_data
+
 print("✅ CA Engine utilities loaded successfully")

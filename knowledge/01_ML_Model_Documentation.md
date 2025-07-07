@@ -195,7 +195,7 @@ def predict_fire_probability(model_path, input_tif_path, output_dir,
 
 ### Model Storage
 - **Trained Model**: `working_forest_fire_ml/fire_pred_model/outputs/final_model.h5`
-- **Model Size**: ~25MB
+- **Model Size**: 427 MB
 - **Format**: TensorFlow SavedModel with custom objects
 - **Version**: TensorFlow 2.x compatible
 

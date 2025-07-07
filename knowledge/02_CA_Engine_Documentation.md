@@ -535,14 +535,190 @@ class SimulationConfig:
     STATISTICS_FORMAT = 'JSON'
 ```
 
----
+## Recent Enhancements (July 2025)
 
-**Key Classes:**
-- `ForestFireCA`: Main simulation engine
-- `FireSpreadRules`: Physics calculations
-- `SimulationConfig`: Parameter management
+### Advanced Configuration System
+The CA engine now includes an enhanced configuration system with type safety and better organization:
 
-**Integration Points:**
-- ML-CA Bridge: Seamless data flow from ML predictions
-- Web Interface: Real-time simulation control
-- Export System: Results packaging for analysis
+```python
+from dataclasses import dataclass
+from typing import Dict, Any, Optional
+
+@dataclass
+class AdvancedCAConfig:
+    """Enhanced CA configuration with type safety"""
+    resolution: float = 30.0  # meters per pixel
+    simulation_hours: int = 6
+    time_step: float = 1.0    # hours
+    use_gpu: bool = True
+    wind_effect_strength: float = 0.3
+    topographic_effect_strength: float = 0.2
+    barrier_effect_strength: float = 0.5
+    
+    # Enhanced LULC fire behavior mapping
+    lulc_fire_behavior: Dict[int, Dict[str, float]] = None
+    
+    def __post_init__(self):
+        if self.lulc_fire_behavior is None:
+            self.lulc_fire_behavior = LULC_FIRE_BEHAVIOR
+
+# Comprehensive LULC mapping with detailed fire behavior parameters
+LULC_FIRE_BEHAVIOR = {
+    10: {"spread_rate": 0.9, "intensity": 0.8, "suppression": 0.2},  # Trees
+    20: {"spread_rate": 0.7, "intensity": 0.6, "suppression": 0.3},  # Shrubland
+    30: {"spread_rate": 0.8, "intensity": 0.7, "suppression": 0.3},  # Grassland
+    40: {"spread_rate": 0.5, "intensity": 0.4, "suppression": 0.4},  # Cropland
+    50: {"spread_rate": 0.0, "intensity": 0.0, "suppression": 1.0},  # Built-up
+    60: {"spread_rate": 0.0, "intensity": 0.0, "suppression": 1.0},  # Bare/sparse
+    70: {"spread_rate": 0.0, "intensity": 0.0, "suppression": 1.0},  # Snow/ice
+    80: {"spread_rate": 0.0, "intensity": 0.0, "suppression": 1.0},  # Water
+    90: {"spread_rate": 0.0, "intensity": 0.0, "suppression": 1.0},  # Wetland
+}
+```
+
+### GPU-Accelerated Utilities
+New TensorFlow-based utility functions for improved performance:
+
+```python
+def calculate_slope_and_aspect_tf(dem_array):
+    """GPU-accelerated slope and aspect calculation using TensorFlow"""
+    dem_tensor = tf.constant(dem_array, dtype=tf.float32)
+    
+    # Calculate gradients using TensorFlow
+    gy, gx = tf.image.image_gradients(tf.expand_dims(dem_tensor, -1))
+    gx = tf.squeeze(gx, -1)
+    gy = tf.squeeze(gy, -1)
+    
+    # Calculate slope and aspect
+    slope = tf.sqrt(gx**2 + gy**2)
+    aspect = tf.atan2(gy, -gx) * 180.0 / tf.constant(np.pi)
+    aspect = tf.where(aspect < 0, aspect + 360, aspect)
+    
+    return slope.numpy(), aspect.numpy()
+
+def resize_array_tf(array, target_shape, method='bilinear'):
+    """GPU-accelerated array resizing using TensorFlow"""
+    tensor = tf.constant(array, dtype=tf.float32)
+    
+    if len(tensor.shape) == 2:
+        tensor = tf.expand_dims(tf.expand_dims(tensor, 0), -1)
+    
+    resized = tf.image.resize(tensor, target_shape, method=method)
+    return tf.squeeze(resized).numpy()
+
+def create_fire_animation_data(frames, metadata):
+    """Create web-ready animation data from simulation frames"""
+    animation_data = {
+        'frames': [],
+        'metadata': metadata,
+        'statistics': []
+    }
+    
+    for i, frame in enumerate(frames):
+        frame_stats = {
+            'time_step': i,
+            'total_burning_cells': int(tf.reduce_sum(tf.cast(frame > 0.1, tf.int32))),
+            'max_intensity': float(tf.reduce_max(frame)),
+            'burned_area_km2': float(tf.reduce_sum(tf.cast(frame > 0.1, tf.float32)) * 0.0009)  # 30m pixels to km²
+        }
+        
+        animation_data['frames'].append(frame.numpy().tolist())
+        animation_data['statistics'].append(frame_stats)
+    
+    return animation_data
+```
+
+### Simplified Rules for Rapid Prototyping
+Added a simplified rules system for faster development and testing:
+
+```python
+class SimplifiedFireRules:
+    """Simplified CA rules for rapid prototyping and parameter tuning"""
+    
+    def __init__(self, spread_rate=0.3, wind_factor=0.2):
+        self.spread_rate = spread_rate
+        self.wind_factor = wind_factor
+        
+        # Simple 3x3 neighborhood kernel
+        self.neighbor_kernel = np.array([
+            [0.1, 0.2, 0.1],
+            [0.2, 0.0, 0.2], 
+            [0.1, 0.2, 0.1]
+        ])
+    
+    def simple_spread(self, fire_state, prob_map, wind_direction=0):
+        """Simple fire spread calculation using numpy operations"""
+        # Basic neighborhood influence
+        from scipy import ndimage
+        neighbor_influence = ndimage.convolve(fire_state, self.neighbor_kernel, mode='constant')
+        
+        # Wind bias (simplified)
+        wind_bias = self.create_wind_bias_kernel(wind_direction)
+        wind_influence = ndimage.convolve(fire_state, wind_bias, mode='constant') * self.wind_factor
+        
+        # Calculate spread probability
+        spread_prob = prob_map + neighbor_influence + wind_influence
+        spread_prob = np.clip(spread_prob, 0, 1)
+        
+        # Update fire state (simple threshold)
+        new_fire = (spread_prob > 0.5) & (fire_state == 0)
+        updated_state = fire_state.copy()
+        updated_state[new_fire] = spread_prob[new_fire]
+        
+        return updated_state
+    
+    def create_wind_bias_kernel(self, wind_direction):
+        """Create wind-biased convolution kernel"""
+        # Simplified wind effect based on direction
+        wind_rad = np.radians(wind_direction)
+        dx, dy = np.cos(wind_rad), np.sin(wind_rad)
+        
+        # Create biased kernel
+        kernel = np.zeros((3, 3))
+        center = 1, 1
+        
+        # Add wind bias to appropriate direction
+        if dx > 0:  # East bias
+            kernel[center[0], center[1] + 1] += 0.3
+        elif dx < 0:  # West bias  
+            kernel[center[0], center[1] - 1] += 0.3
+            
+        if dy > 0:  # North bias
+            kernel[center[0] - 1, center[1]] += 0.3
+        elif dy < 0:  # South bias
+            kernel[center[0] + 1, center[1]] += 0.3
+            
+        return kernel
+```
+
+### Enhanced Exports and Integration
+Updated the module exports to include new functionality:
+
+```python
+# cellular_automata/ca_engine/__init__.py
+from .core import ForestFireCA, run_quick_simulation
+from .config import CAConfig, AdvancedCAConfig, LULC_FIRE_BEHAVIOR, SIMULATION_SCENARIOS
+from .rules import FireSpreadRules, SimplifiedFireRules
+from .utils import (
+    setup_tensorflow_gpu, load_geotiff, save_geotiff,
+    create_ignition_points, calculate_slope_and_aspect_tf,
+    resize_array_tf, create_fire_animation_data
+)
+
+__all__ = [
+    'ForestFireCA', 'run_quick_simulation',
+    'CAConfig', 'AdvancedCAConfig', 'LULC_FIRE_BEHAVIOR', 'SIMULATION_SCENARIOS', 
+    'FireSpreadRules', 'SimplifiedFireRules',
+    'setup_tensorflow_gpu', 'load_geotiff', 'save_geotiff',
+    'create_ignition_points', 'calculate_slope_and_aspect_tf',
+    'resize_array_tf', 'create_fire_animation_data'
+]
+```
+
+### Benefits of Enhancements
+
+1. **Type Safety**: Dataclass-based configuration with proper type hints
+2. **GPU Optimization**: TensorFlow-based utilities for terrain analysis and array operations
+3. **Rapid Prototyping**: Simplified rules system for faster development iterations
+4. **Better Organization**: Clear separation between production and prototyping components
+5. **Enhanced Integration**: Better support for web interface and animation generation

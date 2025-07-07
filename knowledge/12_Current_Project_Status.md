@@ -16,7 +16,7 @@ The Forest Fire Spread Simulation project has reached a significant milestone wi
 
 #### Cellular Automata Consolidation
 
-- **Resolved**: Duplicate CA implementations in `cellular_automata/` vs `working_forest_fire_ml/fire_pred_model/cellular_automata/`
+- **Resolved**: Duplicate CA implementations in `cellular_automata/` vs `forest_fire_ml/cellular_automata/`
 - **Action**: Migrated best features to main implementation, removed duplicate
 - **Result**: Single source of truth with enhanced functionality
 
@@ -90,7 +90,7 @@ GET /api/simulation-cache/<id>
 
 #### 1. Machine Learning Module ✅
 
-- **Location**: `working_forest_fire_ml/`
+- **Location**: `forest_fire_ml/`
 - **Status**: Stable, production-ready
 - **Performance**: 94.2% validation accuracy
 - **Features**: ResUNet-A model, complete prediction pipeline
@@ -143,8 +143,8 @@ GET /api/simulation-cache/<id>
 
 ```
 forest_fire_spread/
-├── working_forest_fire_ml/          # ML prediction module (SINGLE IMPLEMENTATION)
-│   └── fire_pred_model/
+├── forest_fire_ml/          # ML prediction module (SINGLE IMPLEMENTATION)
+│   └──
 ├── cellular_automata/               # CA engine (ENHANCED)
 │   ├── ca_engine/                   # Core CA implementation
 │   ├── integration/                 # ML-CA bridge

@@ -7,7 +7,7 @@
 Two separate ML model implementations were found in the project:
 
 1. **Old Implementation**: `fire_prediction_model/` (root level) - Incomplete and non-functional
-2. **Working Implementation**: `working_forest_fire_ml/fire_pred_model/` - Complete and production-ready
+2. **Working Implementation**: `forest_fire_ml/` - Complete and production-ready
 
 ### Comprehensive Analysis Conducted
 
@@ -55,7 +55,7 @@ def predict_fire_map(tif_path, model_path, output_path, patch_size=256):
 - `model_best.weights.h5`: 153MB (weights only, no architecture)
 - No functional complete model
 
-#### `working_forest_fire_ml/fire_pred_model/` (Working Implementation) - **PRODUCTION-READY**
+#### `forest_fire_ml/` (Working Implementation) - **PRODUCTION-READY**
 
 **Advanced Features:**
 
@@ -131,9 +131,9 @@ from fire_prediction_model.model.resunet_a import build_resunet_a
 from fire_prediction_model.utils.metrics import iou_score, dice_coef
 
 # NEW - Use these imports
-from working_forest_fire_ml.fire_pred_model.predict import predict_fire_probability
-from working_forest_fire_ml.fire_pred_model.model.resunet_a import build_resunet_a
-from working_forest_fire_ml.fire_pred_model.utils.metrics import iou_score, dice_coef, focal_loss
+from forest_fire_ml.fire_pred_model.predict import predict_fire_probability
+from forest_fire_ml.fire_pred_model.model.resunet_a import build_resunet_a
+from forest_fire_ml.fire_pred_model.utils.metrics import iou_score, dice_coef, focal_loss
 ```
 
 #### 3. Architecture Cleanup ✅
@@ -158,8 +158,8 @@ from working_forest_fire_ml.fire_pred_model.utils.metrics import iou_score, dice
 
 ```
 forest_fire_spread/
-├── working_forest_fire_ml/          # SINGLE ML implementation
-│   └── fire_pred_model/
+├── forest_fire_ml/          # SINGLE ML implementation
+│   └──
 │       ├── model/                   # ResUNet-A architecture
 │       ├── dataset/                 # Data loading and preprocessing
 │       ├── utils/                   # Metrics, preprocessing utilities
@@ -183,7 +183,7 @@ class MLCABridge:
     def find_model(self):
         model_paths = [
             # Only working implementation paths remain
-            os.path.join(project_root, "working_forest_fire_ml", "fire_pred_model", "outputs", "final_model.h5"),
+            os.path.join(project_root, "forest_fire_ml", "fire_pred_model", "outputs", "final_model.h5"),
         ]
 ```
 
@@ -192,7 +192,7 @@ class MLCABridge:
 ```python
 # Forest_Fire_CA_Simulation_Kaggle.ipynb
 # Updated all imports to use working implementation
-from working_forest_fire_ml.fire_pred_model.predict import predict_fire_probability
+from forest_fire_ml.fire_pred_model.predict import predict_fire_probability
 ```
 
 ### Quality Assurance
@@ -233,11 +233,11 @@ from working_forest_fire_ml.fire_pred_model.predict import predict_fire_probabil
 
 ```python
 # Standard ML prediction workflow
-from working_forest_fire_ml.fire_pred_model.predict import predict_fire_probability
+from forest_fire_ml.fire_pred_model.predict import predict_fire_probability
 
 # Run prediction with all advanced features
 results = predict_fire_probability(
-    model_path="working_forest_fire_ml/fire_pred_model/outputs/final_model.h5",
+    model_path="forest_fire_ml/outputs/final_model.h5",
     input_tif_path="input_data.tif",
     output_dir="predictions/",
     threshold=0.5  # Configurable threshold

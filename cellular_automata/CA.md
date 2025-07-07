@@ -1,7 +1,9 @@
 # Forest Fire Spread Prediction & Cellular Automata Integration
+
 ## Comprehensive Requirements & Implementation Guide
 
 ### Project Overview
+
 This document summarizes the complete requirements, current state, and implementation strategy for integrating Cellular Automata (CA) fire spread simulation with the existing ML-based fire prediction system for the Uttarakhand forest fire project.
 
 **Timeline**: 2 days for current submission, with future finals preparation
@@ -13,6 +15,7 @@ This document summarizes the complete requirements, current state, and implement
 ## Current System Status
 
 ### ML Model & Data Pipeline ✅
+
 - **Model**: ResUNet-A architecture trained and ready
 - **Datasets**: Complete stack for April 1 - May 29, 2016
   - DEM (SRTM), ERA5 Daily, LULC 2020, GHSL 2015, Fire masks (VIIRS)
@@ -21,13 +24,15 @@ This document summarizes the complete requirements, current state, and implement
   - Geographic coverage: Full Uttarakhand state
 
 ### Current Outputs
+
 - **Fire Probability Maps**: 0-1 range, .tif format, 30m resolution
-- **Binary Fire/No-fire Masks**: 0 or 1, .tif format, 30m resolution  
+- **Binary Fire/No-fire Masks**: 0 or 1, .tif format, 30m resolution
 - **Fire Confidence Zone Maps**: .tif format, 30m resolution
-- **Model Location**: `working_forest_fire_ml/fire_pred_model/` (functional codebase)
+- **Model Location**: `forest_fire_ml/` (functional codebase)
 - **Prediction Pipeline**: Sliding window approach in `predict.py`
 
 ### Infrastructure
+
 - **Training**: Kaggle GPU notebooks
 - **Demo Deployment**: Local hosting (current), cloud deployment (finals)
 - **Target Hardware**: Local machines for current submission
@@ -38,6 +43,7 @@ This document summarizes the complete requirements, current state, and implement
 ## Cellular Automata Requirements
 
 ### Core Specifications
+
 - **Spatial Resolution**: 30m (matching ML model output)
 - **Geographic Scope**: Full Uttarakhand state with zoom functionality
 - **Temporal Resolution**: Hourly simulation updates
@@ -45,6 +51,7 @@ This document summarizes the complete requirements, current state, and implement
 - **Weather Handling**: Constant daily weather (no hourly interpolation)
 
 ### Technical Implementation Strategy
+
 - **Framework**: TensorFlow/GPU acceleration (chosen for finals scalability)
 - **Input Source**: Daily ML-generated probability maps (not real-time inference)
 - **Physics Model**: Simplified rules (current), Rothermel physics (finals)
@@ -52,9 +59,10 @@ This document summarizes the complete requirements, current state, and implement
 - **Fire Suppression**: Basic implementation using barrier data
 
 ### CA Algorithm Design
+
 ```
 Input: Daily probability map (0-1), weather constants, ignition points
-Process: 
+Process:
 1. Initialize grid from ML probability map
 2. Apply CA rules with neighborhood analysis
 3. Factor in wind direction/speed (constant daily)
@@ -69,15 +77,18 @@ Output: Hourly fire spread maps + animation
 ## Website Integration Plan
 
 ### Development Strategy: Option B (Parallel Development)
-**Day 1**: 
+
+**Day 1**:
+
 - Person 1: CA core implementation + basic testing
 - Person 2: Website skeleton + basic interface
-**Day 2**: 
+  **Day 2**:
 - Integration sprint + optimization + debugging
 
 ### User Interface Specifications
 
 #### Current Submission Features (Basic)
+
 - **Ignition Interface**: Click points on map to ignite fires
 - **Date Selection**: Choose from available dates (April-May 2016)
 - **Animation Viewer**: Watch pre-computed simulation with time controls
@@ -85,6 +96,7 @@ Output: Hourly fire spread maps + animation
 - **Output Display**: Side-by-side comparison (probability vs. simulated spread)
 
 #### Future Features (Finals)
+
 - Draw custom fire perimeters
 - Real-time weather parameter adjustment
 - Multi-scenario comparison
@@ -92,6 +104,7 @@ Output: Hourly fire spread maps + animation
 - Advanced visualization controls
 
 ### Technology Stack
+
 - **Current**: Local web application
 - **Future**: Online deployment-ready architecture
 - **Integration**: Direct connection between CA engine and web interface
@@ -118,6 +131,7 @@ Workflow Pipeline:
 ```
 
 ### File Organization
+
 ```
 cellular_automata/
 ├── CA.md (this file)
@@ -142,6 +156,7 @@ cellular_automata/
 ## Submission Requirements
 
 ### Deliverables
+
 1. **Fire Prediction Maps**: Next-day probability maps
 2. **Animated Fire Spread**: 1/2/3/6/12 hour simulations
 3. **Interactive Website**: Local demo with basic functionality
@@ -149,6 +164,7 @@ cellular_automata/
 5. **Optional**: Live interactive demo (good to have)
 
 ### Evaluation Metrics
+
 - **Accuracy**: Fire prediction map quality
 - **Fidelity**: Spread simulation realism
 - **Visual Appeal**: Demo presentation quality
@@ -159,6 +175,7 @@ cellular_automata/
 ## Technical Decisions & Constraints
 
 ### Resolved Questions
+
 - **Model Output**: Use daily probability maps as CA input (not real-time inference)
 - **Weather Data**: Constant daily values (no hourly interpolation needed)
 - **Spatial Coverage**: Full Uttarakhand state with zoom capability
@@ -168,6 +185,7 @@ cellular_automata/
 - **Framework**: TensorFlow/GPU for scalability
 
 ### Implementation Priorities
+
 1. **Visual Appeal**: Impressive demo for submission
 2. **Functional Completeness**: All basic features working
 3. **Technical Accuracy**: Realistic but not necessarily scientifically perfect
@@ -177,12 +195,14 @@ cellular_automata/
 ## Next Steps
 
 ### Immediate Actions
+
 1. **Verify Current Outputs**: Test prediction pipeline on 2016 data
 2. **CA Core Development**: Implement basic TensorFlow-based CA engine
 3. **Web Framework Setup**: Create basic interface skeleton
 4. **Integration Planning**: Design data flow between components
 
 ### Development Milestones
+
 - **Day 1 Morning**: CA core + web skeleton
 - **Day 1 Evening**: Basic functionality testing
 - **Day 2 Morning**: Integration + debugging
@@ -193,11 +213,13 @@ cellular_automata/
 ## Risk Assessment & Mitigation
 
 ### High Risk Areas
+
 - **TensorFlow CA Implementation**: Complex but necessary for finals
 - **Real-time Integration**: ML model → CA → Web pipeline
 - **Performance Optimization**: Full-state simulation at 30m resolution
 
 ### Fallback Strategies
+
 - **Pre-computed Scenarios**: If real-time simulation fails
 - **Simplified CA Rules**: If TensorFlow implementation is too complex
 - **Static Visualization**: If interactive features don't integrate properly
@@ -207,6 +229,7 @@ cellular_automata/
 ## Future Enhancements (Finals)
 
 ### Advanced Features
+
 - **Rothermel Physics**: Scientific fire spread equations
 - **Real-time Weather**: API integration for current conditions
 - **Fire Suppression Modeling**: Aircraft, ground crews, water sources
@@ -214,6 +237,7 @@ cellular_automata/
 - **Export Capabilities**: Results download and sharing
 
 ### Scalability Considerations
+
 - **Cloud Deployment**: ISRO-provided infrastructure
 - **Multi-user Support**: Concurrent simulation handling
 - **Data Pipeline Optimization**: Faster prediction generation

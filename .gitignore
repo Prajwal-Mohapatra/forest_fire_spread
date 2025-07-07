@@ -32,8 +32,8 @@ wheels/
 *.egg
 
 # ML model outputs
-# Old implementation removed - using working_forest_fire_ml/ only
-# working_forest_fire_ml/fire_pred_model/outputs/
+# Old implementation removed - using forest_fire_ml/ only
+# forest_fire_ml/outputs/
 *.h5
 *.hdf5
 *.pkl

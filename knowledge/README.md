@@ -20,13 +20,15 @@ GeoTIFF     Prediction   CA Core     Frontend      Demo
 
 ## Core Components
 
-### 1. 🧠 Machine Learning Module (`working_forest_fire_ml/`)
+### 1. 🧠 Machine Learning Module (`forest_fire_ml/`)
+
 - **ResUNet-A Model**: Deep learning architecture for fire probability prediction
 - **Input Processing**: 9-band environmental data stack (DEM, ERA5, LULC, GHSL, etc.)
 - **Output**: Daily fire probability maps (0-1 range, 30m resolution)
 - **Training Data**: April 1 - May 29, 2016 (Uttarakhand fire season)
 
 ### 2. 🔥 Cellular Automata Engine (`cellular_automata/`)
+
 - **TensorFlow-based CA**: GPU-accelerated fire spread simulation
 - **Enhanced Configuration**: Dataclass-based configuration with type safety
 - **Advanced Utilities**: GPU-accelerated terrain analysis and array operations
@@ -36,11 +38,13 @@ GeoTIFF     Prediction   CA Core     Frontend      Demo
 - **Integration**: Seamless connection with ML probability maps
 
 ### 3. 🌉 ML-CA Integration Bridge (`cellular_automata/integration/`)
+
 - **Data Pipeline**: Orchestrates ML predictions → CA simulation workflow
 - **Validation**: Ensures data consistency between ML outputs and CA inputs
 - **Scenario Management**: Handles multiple ignition scenarios and weather conditions
 
 ### 4. 🖥️ Web Interface (`cellular_automata/web_interface/`)
+
 - **Enhanced API**: Flask backend with multiple scenario comparison and caching
 - **React Integration**: Comprehensive guide for professional frontend development
 - **Interactive Demo**: Complete examples with ISRO-themed styling
@@ -49,6 +53,7 @@ GeoTIFF     Prediction   CA Core     Frontend      Demo
 - **Visualization**: Real-time fire spread animation with multiple map layers
 
 ### 5. 📊 Kaggle Orchestration (`Forest_Fire_CA_Simulation_Kaggle.ipynb`)
+
 - **Clean Integration**: Calls existing project functions (no code duplication)
 - **Demo Ready**: Interactive widgets for parameter tuning
 - **Export Package**: Prepares data for React frontend integration
@@ -74,18 +79,21 @@ GeoTIFF     Prediction   CA Core     Frontend      Demo
 ## Recent Updates (July 2025)
 
 ### Architecture Consolidation ✅
+
 - **Duplicate Code Resolution**: Eliminated redundant cellular automata and web interface implementations
 - **Enhanced Functionality**: Migrated best features from duplicates to main codebase
 - **Improved Documentation**: Added comprehensive migration guides and React integration examples
 - **Quality Improvements**: Better type safety, GPU optimization, and code organization
 
 ### New Components Added
+
 - **Advanced Configuration**: Dataclass-based CA configuration with type hints
 - **GPU Utilities**: TensorFlow-based slope calculation and array operations
 - **Enhanced API**: Multiple scenario comparison, caching, and export endpoints
 - **React Integration**: Production-ready frontend development guide with ISRO styling
 
 ### Documentation Freshness Tracking
+
 - **Last Major Update**: July 7, 2025
 - **Components Updated**: CA Engine, Web Interface, Progress Report, Technical Decisions, Future Roadmap
 - **New Documentation**: Current Project Status, CA Duplication Resolution, React Integration Guide
@@ -94,19 +102,22 @@ GeoTIFF     Prediction   CA Core     Frontend      Demo
 ## Quick Start Guide
 
 ### For Developers
+
 1. **Clone Repository**: `git clone https://github.com/Prajwal-Mohapatra/forest_fire_spread.git`
 2. **Setup ML Environment**: Configure Python environment with TensorFlow, rasterio, etc.
-3. **Download Model**: Ensure `final_model.h5` is in `working_forest_fire_ml/fire_pred_model/outputs/`
+3. **Download Model**: Ensure `final_model.h5` is in `forest_fire_ml/outputs/`
 4. **Test Pipeline**: Run Kaggle orchestration notebook for end-to-end verification
 5. **Launch Web Interface**: Start React development server for interactive demo
 
 ### For Researchers
+
 1. **Review Model Performance**: Check training metrics and validation results
 2. **Examine CA Physics**: Understand fire spread rules and environmental factors
 3. **Interactive Demo**: Use web interface for scenario testing and analysis
 4. **Export Results**: Generate GeoTIFF outputs for external analysis
 
 ### For End Users
+
 1. **Access Web Demo**: Open browser interface
 2. **Select Date/Location**: Choose from available 2016 fire season data
 3. **Set Ignition Points**: Click on map to add fire start locations
@@ -117,6 +128,7 @@ GeoTIFF     Prediction   CA Core     Frontend      Demo
 ## Key Features
 
 ### Technical Capabilities
+
 - **High Resolution**: 30m spatial resolution across full Uttarakhand state
 - **GPU Acceleration**: TensorFlow-based computation for performance
 - **Real-time Simulation**: Hourly time steps with interactive controls
@@ -124,6 +136,7 @@ GeoTIFF     Prediction   CA Core     Frontend      Demo
 - **Data Validation**: Automated consistency checks between ML and CA components
 
 ### User Experience
+
 - **Interactive Visualization**: Click-to-ignite interface with real-time feedback
 - **Professional Interface**: ISRO-themed design for researcher audience
 - **Animation Controls**: Play/pause/speed controls for simulation playback
@@ -131,6 +144,7 @@ GeoTIFF     Prediction   CA Core     Frontend      Demo
 - **Responsive Design**: Works on desktop and tablet devices
 
 ### Scientific Accuracy
+
 - **Validated ML Model**: ResUNet-A trained on real fire occurrence data
 - **Physics-based CA**: Fire spread rules incorporating wind, topography, barriers
 - **Environmental Integration**: DEM, land use, settlement data influence spread patterns
@@ -139,6 +153,7 @@ GeoTIFF     Prediction   CA Core     Frontend      Demo
 ## Data Sources
 
 ### Primary Datasets
+
 - **DEM**: SRTM 30m elevation data
 - **Weather**: ERA5 daily meteorological variables
 - **Land Use**: LULC 2020 classification
@@ -146,6 +161,7 @@ GeoTIFF     Prediction   CA Core     Frontend      Demo
 - **Fire History**: VIIRS active fire detections (2016)
 
 ### Processed Outputs
+
 - **Stacked TIFFs**: 9-band environmental data stacks
 - **Probability Maps**: ML-generated daily fire probability (0-1)
 - **Binary Maps**: Threshold-based fire/no-fire classification
@@ -154,12 +170,14 @@ GeoTIFF     Prediction   CA Core     Frontend      Demo
 ## Performance Metrics
 
 ### ML Model Performance
+
 - **Training Accuracy**: ~94% on validation set
 - **IoU Score**: 0.87 for fire detection
 - **Dice Coefficient**: 0.91 for segmentation quality
 - **Inference Speed**: ~2 minutes for full Uttarakhand prediction
 
 ### CA Simulation Performance
+
 - **Spatial Coverage**: 400x400 km at 30m resolution
 - **Temporal Resolution**: Hourly updates over 1-12 hour simulations
 - **GPU Acceleration**: 10x speedup vs CPU-only implementation
@@ -168,6 +186,7 @@ GeoTIFF     Prediction   CA Core     Frontend      Demo
 ## Integration Points
 
 ### Data Flow
+
 1. **Input Preparation**: Stack environmental layers for specific date
 2. **ML Prediction**: Generate fire probability map using ResUNet-A
 3. **CA Initialization**: Load probability map as base state
@@ -176,12 +195,14 @@ GeoTIFF     Prediction   CA Core     Frontend      Demo
 6. **Export**: Package results for external analysis
 
 ### API Endpoints
+
 - `/api/predict`: Generate ML fire probability prediction
 - `/api/simulate`: Run CA fire spread simulation
 - `/api/scenario`: Create/manage simulation scenarios
 - `/api/export`: Download simulation results
 
 ### File Formats
+
 - **Input**: GeoTIFF (stacked environmental data)
 - **Intermediate**: GeoTIFF (probability maps), JSON (metadata)
 - **Output**: GeoTIFF (simulation frames), MP4/GIF (animations), JSON (statistics)
@@ -189,12 +210,14 @@ GeoTIFF     Prediction   CA Core     Frontend      Demo
 ## Contact & Support
 
 ### Development Team
+
 - **ML Model**: Fire prediction model development and training
 - **CA Engine**: Cellular automata physics and simulation
 - **Integration**: ML-CA bridge and data pipeline
 - **Frontend**: Web interface and visualization
 
 ### Technical Support
+
 - **Documentation**: Comprehensive guides in this knowledge base
 - **Code Examples**: Working examples in Kaggle orchestration notebook
 - **Issue Tracking**: GitHub repository issue tracker
@@ -206,7 +229,8 @@ GeoTIFF     Prediction   CA Core     Frontend      Demo
 **Version**: 1.1.0
 **Status**: Production Ready - Enhanced with Architecture Consolidation
 
-**Recent Changes**: 
+**Recent Changes**:
+
 - Eliminated code duplication and consolidated architecture
 - Enhanced cellular automata engine with advanced configuration and GPU utilities
 - Improved web interface with multiple scenario comparison and comprehensive React guide

@@ -73,7 +73,7 @@ FIRE_COLORMAP = {
 
 # Data Paths (relative to project root)
 DATA_PATHS = {
-    'ml_predictions': 'working_forest_fire_ml/fire_pred_model/outputs/predictions/',
+    'ml_predictions': 'forest_fire_ml/outputs/predictions/',
     'dem_data': 'dataset collection/',
     'weather_data': 'dataset collection/',
     'lulc_data': 'dataset collection/',
@@ -92,7 +92,7 @@ LOG_LEVEL = "INFO"
 PROGRESS_UPDATE_INTERVAL = 100  # cells processed
 
 # Model Integration
-ML_MODEL_PATH = "working_forest_fire_ml/fire_pred_model/outputs/final_model.h5"
+ML_MODEL_PATH = "forest_fire_ml/outputs/final_model.h5"
 PREDICTION_CACHE_SIZE = 10  # number of daily predictions to cache
 
 # Enhanced Configuration Classes (merged from duplicate folder)

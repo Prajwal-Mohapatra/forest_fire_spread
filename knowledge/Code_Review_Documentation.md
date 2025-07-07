@@ -25,7 +25,7 @@ The Forest Fire Spread Simulation project is a **sophisticated, production-ready
 
 ### Core Components Analysis
 
-#### 1. **Machine Learning Module** (`working_forest_fire_ml/fire_pred_model/`)
+#### 1. **Machine Learning Module** (`forest_fire_ml/`)
 
 **Architecture**: Advanced ResUNet-A with ASPP and residual connections
 

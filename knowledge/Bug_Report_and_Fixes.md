@@ -147,7 +147,7 @@ print(f"   Hours simulated: {ca_results.get('total_hours_simulated', 'N/A')}")  
 **Issue**: ML model file not found at expected location
 
 ```bash
-❌ Missing (/home/swayam/projects/forest_fire_spread/working_forest_fire_ml/fire_pred_model/outputs/final_model.h5)
+❌ Missing (/home/swayam/projects/forest_fire_spread/forest_fire_ml/outputs/final_model.h5)
 ```
 
 **Root Cause**: Hardcoded path doesn't match actual model location
@@ -228,10 +228,10 @@ from utils.visualize import create_fire_animation, plot_fire_progression
 
 ```python
 # ✅ These match actual working implementation structure
-from working_forest_fire_ml.fire_pred_model.predict import predict_fire_probability
-from working_forest_fire_ml.fire_pred_model.model.resunet_a import build_resunet_a
-from working_forest_fire_ml.fire_pred_model.utils.metrics import iou_score, dice_coef, focal_loss
-from working_forest_fire_ml.fire_pred_model.utils.preprocess import normalize_patch
+from forest_fire_ml.fire_pred_model.predict import predict_fire_probability
+from forest_fire_ml.fire_pred_model.model.resunet_a import build_resunet_a
+from forest_fire_ml.fire_pred_model.utils.metrics import iou_score, dice_coef, focal_loss
+from forest_fire_ml.fire_pred_model.utils.preprocess import normalize_patch
 from cellular_automata.ca_engine.core import ForestFireCA, run_quick_simulation, run_full_simulation
 from cellular_automata.ca_engine.utils import setup_tensorflow_gpu, load_probability_map, create_fire_animation_data
 from cellular_automata.ca_engine.config import DEFAULT_WEATHER_PARAMS, WIND_DIRECTIONS

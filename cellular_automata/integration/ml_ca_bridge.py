@@ -16,7 +16,7 @@ import json
 # Add project paths
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(project_root)
-sys.path.append(os.path.join(project_root, "working_forest_fire_ml", "fire_pred_model"))
+sys.path.append(os.path.join(project_root, "forest_fire_ml", "fire_pred_model"))
 
 class MLCABridge:
     """
@@ -38,7 +38,7 @@ class MLCABridge:
         # Set default paths - use working implementation only
         if ml_model_path is None:
             possible_model_paths = [
-                os.path.join(project_root, "working_forest_fire_ml", "fire_pred_model", "outputs", "final_model.h5"),
+                os.path.join(project_root, "forest_fire_ml", "fire_pred_model", "outputs", "final_model.h5"),
                 os.path.join(project_root, "outputs", "final_model.h5")
             ]
             

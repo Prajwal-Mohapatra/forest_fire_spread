@@ -47,7 +47,7 @@
 ### Production Model Preserved ✅
 
 ```bash
-$ ls -lh working_forest_fire_ml/fire_pred_model/outputs/final_model.h5
+$ ls -lh forest_fire_ml/outputs/final_model.h5
 -rw-rw-r-- 1 swayam swayam 428M Jul  8 00:50 final_model.h5
 ```
 
@@ -75,8 +75,8 @@ $ find . -name "*.py" -o -name "*.ipynb" | xargs grep -l "fire_prediction_model"
 
 ```
 forest_fire_spread/
-├── working_forest_fire_ml/          # 🧠 SINGLE ML IMPLEMENTATION
-│   └── fire_pred_model/
+├── forest_fire_ml/          # 🧠 SINGLE ML IMPLEMENTATION
+│   └──
 │       ├── model/                   # Advanced ResUNet-A with ASPP
 │       ├── dataset/                 # Sophisticated data loading
 │       ├── utils/                   # Focal loss, advanced metrics
@@ -160,8 +160,8 @@ forest_fire_spread/
 
 ### ✅ READY FOR USE
 
-1. **Development**: Use `working_forest_fire_ml/fire_pred_model/` for all ML functionality
-2. **Model Loading**: Use `working_forest_fire_ml/fire_pred_model/outputs/final_model.h5`
+1. **Development**: Use `forest_fire_ml/` for all ML functionality
+2. **Model Loading**: Use `forest_fire_ml/outputs/final_model.h5`
 3. **Integration**: ML-CA bridge automatically uses correct paths
 4. **Documentation**: All knowledge base updated to reflect single implementation
 
@@ -169,10 +169,10 @@ forest_fire_spread/
 
 ```python
 # ✅ CORRECT - Use these imports going forward
-from working_forest_fire_ml.fire_pred_model.predict import predict_fire_probability
-from working_forest_fire_ml.fire_pred_model.model.resunet_a import build_resunet_a
-from working_forest_fire_ml.fire_pred_model.utils.metrics import iou_score, dice_coef, focal_loss
-from working_forest_fire_ml.fire_pred_model.utils.preprocess import normalize_patch
+from forest_fire_ml.fire_pred_model.predict import predict_fire_probability
+from forest_fire_ml.fire_pred_model.model.resunet_a import build_resunet_a
+from forest_fire_ml.fire_pred_model.utils.metrics import iou_score, dice_coef, focal_loss
+from forest_fire_ml.fire_pred_model.utils.preprocess import normalize_patch
 
 # ❌ OLD - These no longer exist
 # from fire_prediction_model.predict import predict_fire_map

@@ -25,16 +25,16 @@ The Forest Fire Spread Simulation project is a **sophisticated, production-ready
 
 ### Core Components Analysis
 
-#### 1. **Machine Learning Module** (`fire_prediction_model/`)
+#### 1. **Machine Learning Module** (`working_forest_fire_ml/fire_pred_model/`)
 
-**Architecture**: ResUNet-A with attention mechanisms
+**Architecture**: Advanced ResUNet-A with ASPP and residual connections
 
 ```python
 # Key strengths identified:
-- Attention gates for better feature focus
-- Dilated convolutions in bottleneck
-- Proper batch normalization and activation
-- Clean separation of model definition and prediction logic
+- ASPP (Atrous Spatial Pyramid Pooling) for multi-scale features
+- Residual connections for improved gradient flow
+- Focal loss for class imbalance handling
+- Complete prediction pipeline with sliding window approach
 ```
 
 **Code Quality**: ⭐⭐⭐⭐⭐

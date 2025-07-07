@@ -35,12 +35,10 @@ class MLCABridge:
             ca_output_dir: Directory for CA simulation outputs
         """
         
-        # Set default paths - check multiple possible locations
+        # Set default paths - use working implementation only
         if ml_model_path is None:
             possible_model_paths = [
                 os.path.join(project_root, "working_forest_fire_ml", "fire_pred_model", "outputs", "final_model.h5"),
-                os.path.join(project_root, "fire_prediction_model", "outputs", "checkpoints", "model_best.weights.h5"),
-                os.path.join(project_root, "fire_prediction_model", "outputs", "final_model.h5"),
                 os.path.join(project_root, "outputs", "final_model.h5")
             ]
             
@@ -101,7 +99,8 @@ class MLCABridge:
             )
         
         try:
-            # Import ML prediction function
+            # Import ML prediction function from working implementation
+            # The path is already added in the module initialization above
             from predict import predict_fire_probability
             
             print(f"🔮 Generating ML prediction...")

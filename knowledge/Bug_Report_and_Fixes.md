@@ -227,12 +227,11 @@ from utils.visualize import create_fire_animation, plot_fire_progression
 **Correct Import Paths**:
 
 ```python
-# ✅ These match actual structure
-from fire_prediction_model.predict import predict_fire_map
-from fire_prediction_model.model.resunet_a import build_resunet_a
-from fire_prediction_model.utils.metrics import iou_score, dice_coef
-from fire_prediction_model.dataset.preprocess import normalize_patch
-from fire_prediction_model.utils.visualize import plot_prediction
+# ✅ These match actual working implementation structure
+from working_forest_fire_ml.fire_pred_model.predict import predict_fire_probability
+from working_forest_fire_ml.fire_pred_model.model.resunet_a import build_resunet_a
+from working_forest_fire_ml.fire_pred_model.utils.metrics import iou_score, dice_coef, focal_loss
+from working_forest_fire_ml.fire_pred_model.utils.preprocess import normalize_patch
 from cellular_automata.ca_engine.core import ForestFireCA, run_quick_simulation, run_full_simulation
 from cellular_automata.ca_engine.utils import setup_tensorflow_gpu, load_probability_map, create_fire_animation_data
 from cellular_automata.ca_engine.config import DEFAULT_WEATHER_PARAMS, WIND_DIRECTIONS
@@ -262,6 +261,7 @@ from cellular_automata.integration.ml_ca_bridge import MLCABridge
 ```
 
 **Root Cause**: Multiple issues:
+
 1. ML predict.py uses relative imports that fail in Kaggle environment
 2. `run_full_simulation` was a class method, not module-level function
 3. `DEFAULT_WEATHER_PARAMS` constant didn't exist in config
@@ -269,6 +269,7 @@ from cellular_automata.integration.ml_ca_bridge import MLCABridge
 **Impact**: Kaggle notebook completely non-functional for demonstration
 
 **Files Affected**:
+
 - `/fire_prediction_model/predict.py` (lines 1-5)
 - `/cellular_automata/ca_engine/core.py` (missing module-level function)
 - `/cellular_automata/ca_engine/config.py` (missing constant)
@@ -276,6 +277,7 @@ from cellular_automata.integration.ml_ca_bridge import MLCABridge
 **Solution Applied**:
 
 1. **Fixed ML Import Issues**:
+
 ```python
 # Added robust import handling in predict.py
 try:
@@ -294,6 +296,7 @@ except ImportError:
 ```
 
 2. **Added Module-Level CA Functions**:
+
 ```python
 # Added run_full_simulation as module-level function in core.py
 def run_full_simulation(probability_map_path: str, ignition_points: List, ...):
@@ -302,6 +305,7 @@ def run_full_simulation(probability_map_path: str, ignition_points: List, ...):
 ```
 
 3. **Added Missing Config Constants**:
+
 ```python
 # Added to config.py
 DEFAULT_WEATHER_PARAMS = {
@@ -310,6 +314,7 @@ DEFAULT_WEATHER_PARAMS = {
 ```
 
 4. **Enhanced Notebook Error Handling**:
+
 ```python
 # Added graceful fallbacks in notebook imports
 try:

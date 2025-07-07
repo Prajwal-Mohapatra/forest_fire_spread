@@ -155,8 +155,8 @@ kaggle datasets download -d your-username/stacked-fire-probability-prediction-da
 unzip stacked-fire-probability-prediction-dataset.zip -d data/
 
 # Download unstacked dataset (optional)
-kaggle datasets download -d your-username/fire-probability-prediction-map-unstacked-data
-unzip fire-probability-prediction-map-unstacked-data.zip -d data/
+kaggle datasets download -d your-username/datasets
+unzip datasets.zip -d data/
 ```
 
 #### Option B: Manual Data Collection

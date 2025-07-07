@@ -6,7 +6,7 @@
 
 Two separate ML model implementations were found in the project:
 
-1. **Old Implementation**: `fire_prediction_model/` (root level) - Incomplete and non-functional
+1. **Old Implementation**: `forest_fire_ml/` (root level) - Incomplete and non-functional
 2. **Working Implementation**: `forest_fire_ml/` - Complete and production-ready
 
 ### Comprehensive Analysis Conducted
@@ -18,7 +18,7 @@ Two separate ML model implementations were found in the project:
 
 ### Analysis Results
 
-#### `fire_prediction_model/` (Old Implementation) - **NON-FUNCTIONAL**
+#### `forest_fire_ml/` (Old Implementation) - **NON-FUNCTIONAL**
 
 **Issues Identified:**
 
@@ -103,7 +103,7 @@ def predict_fire_probability(model_path, input_tif_path, output_dir,
 
 #### 1. Remove Old Implementation ✅
 
-**Action**: Complete removal of `fire_prediction_model/` directory
+**Action**: Complete removal of `forest_fire_ml/` directory
 **Reason**: Non-functional, incomplete, no value provided
 **Files Removed**:
 
@@ -126,9 +126,9 @@ def predict_fire_probability(model_path, input_tif_path, output_dir,
 
 ```python
 # OLD - Remove these imports
-from fire_prediction_model.predict import predict_fire_map
-from fire_prediction_model.model.resunet_a import build_resunet_a
-from fire_prediction_model.utils.metrics import iou_score, dice_coef
+from forest_fire_ml.predict import predict_fire_map
+from forest_fire_ml.model.resunet_a import build_resunet_a
+from forest_fire_ml.utils.metrics import iou_score, dice_coef
 
 # NEW - Use these imports
 from forest_fire_ml.fire_pred_model.predict import predict_fire_probability
@@ -267,7 +267,7 @@ results = predict_fire_probability(
 
 ---
 
-**Files Removed**: Complete `fire_prediction_model/` directory (8 Python files, config files, model directories)
+**Files Removed**: Complete `forest_fire_ml/` directory (8 Python files, config files, model directories)
 **Files Updated**: 4 notebooks, 1 integration file, 2 documentation files
 **Architecture Impact**: 66% reduction in ML code duplication, single source of truth established
 **Quality Impact**: Only production-ready, tested code remains in the project

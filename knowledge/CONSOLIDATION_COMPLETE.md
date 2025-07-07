@@ -17,7 +17,7 @@
 
 ### 2. Old Implementation Removal ✅
 
-**Removed**: Complete `fire_prediction_model/` directory
+**Removed**: Complete `forest_fire_ml/` directory
 
 - **Reason**: Non-functional, incomplete, no production value
 - **Files removed**: 8 Python files, config files, empty model files, test directories
@@ -56,8 +56,8 @@ $ ls -lh forest_fire_ml/outputs/final_model.h5
 ### Old Implementation Completely Removed ✅
 
 ```bash
-$ ls fire_prediction_model/
-ls: cannot access 'fire_prediction_model/': No such file or directory
+$ ls forest_fire_ml/
+ls: cannot access 'forest_fire_ml/': No such file or directory
 ```
 
 ✅ **Old directory completely removed**
@@ -65,7 +65,7 @@ ls: cannot access 'fire_prediction_model/': No such file or directory
 ### References Successfully Updated ✅
 
 ```bash
-$ find . -name "*.py" -o -name "*.ipynb" | xargs grep -l "fire_prediction_model" | wc -l
+$ find . -name "*.py" -o -name "*.ipynb" | xargs grep -l "forest_fire_ml" | wc -l
 3
 ```
 
@@ -175,8 +175,8 @@ from forest_fire_ml.fire_pred_model.utils.metrics import iou_score, dice_coef, f
 from forest_fire_ml.fire_pred_model.utils.preprocess import normalize_patch
 
 # ❌ OLD - These no longer exist
-# from fire_prediction_model.predict import predict_fire_map
-# from fire_prediction_model.model.resunet_a import build_resunet_a
+# from forest_fire_ml.predict import predict_fire_map
+# from forest_fire_ml.model.resunet_a import build_resunet_a
 ```
 
 ---

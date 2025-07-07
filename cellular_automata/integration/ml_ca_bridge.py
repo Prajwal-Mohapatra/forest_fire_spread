@@ -38,7 +38,7 @@ class MLCABridge:
         # Set default paths - use working implementation only
         if ml_model_path is None:
             possible_model_paths = [
-                os.path.join(project_root, "forest_fire_ml", "fire_pred_model", "outputs", "final_model.h5"),
+                os.path.join(project_root, "forest_fire_ml", "outputs", "final_model.h5"),
                 os.path.join(project_root, "outputs", "final_model.h5")
             ]
             
@@ -390,7 +390,7 @@ class MLCABridge:
         
         try:
             # Create synthetic probability map
-            from cellular_automata.test_ca_engine import create_synthetic_probability_map
+            from cellular_automata.ca_engine.utils import create_synthetic_probability_map
             
             prob_map_path = os.path.join(
                 self.ca_output_dir, f"synthetic_demo_{demo_location}_{demo_date}.tif"

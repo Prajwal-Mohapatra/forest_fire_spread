@@ -1,7 +1,8 @@
 # Data files and directories
-fire-probability-prediction-map-unstacked-data/
+datasets/
 dataset_stacked/
 dataset_unstacked/
+success_runs/
 
 # Jupyter notebooks
 dataset_stacking.ipynb

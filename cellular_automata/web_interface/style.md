@@ -1,6 +1,6 @@
 // The Minions
 color: #1C140D;
- font-size: 18px;
+ font-size: 24px;
  font-family: Space Grotesk;
  font-weight: 700;
  line-height: 23px;
@@ -8,7 +8,7 @@ color: #1C140D;
 ---
 // Bharatiya Antariksh Hackathon 2025
 color: #1C140D;
- font-size: 18px;
+ font-size: 24px;
  font-family: Space Grotesk;
  font-weight: 700;
  line-height: 23px;

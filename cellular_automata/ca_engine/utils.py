@@ -8,7 +8,7 @@ Handles coordinate transformations, data loading, and geometric calculations.
 
 import numpy as np
 import rasterio
-from rasterio.transform import from_bounds
+from rasterio.transform import from_bounds, from_origin
 import tensorflow as tf
 from typing import Tuple, List, Dict, Optional, Union
 import os
@@ -398,5 +398,61 @@ def create_fire_animation_data(simulation_frames: List[np.ndarray],
         animation_data['frames'].append(frame_data)
     
     return animation_data
+
+def create_synthetic_probability_map(output_path: str, width: int = 500, height: int = 500):
+    """Create a synthetic fire probability map for testing and demonstration."""
+    try:
+        # Create synthetic probability data
+        # Higher probabilities in the center, lower at edges
+        x = np.linspace(-1, 1, width)
+        y = np.linspace(-1, 1, height)
+        X, Y = np.meshgrid(x, y)
+        
+        # Gaussian-like distribution with some noise
+        distance = np.sqrt(X**2 + Y**2)
+        base_prob = np.exp(-distance**2 / 0.5)
+        noise = np.random.normal(0, 0.1, (height, width))
+        probability = np.clip(base_prob + noise, 0, 1).astype(np.float32)
+        
+        # Add some high-risk areas
+        if width > 150 and height > 150:
+            probability[100:150, 100:150] = np.clip(probability[100:150, 100:150] + 0.3, 0, 1)
+        if width > 350 and height > 350:
+            probability[300:350, 300:350] = np.clip(probability[300:350, 300:350] + 0.4, 0, 1)
+        
+        # Define geographic bounds (roughly Uttarakhand region)
+        bounds = (77.0, 29.5, 81.0, 31.5)  # (west, south, east, north)
+        transform = from_bounds(*bounds, width, height)
+        
+        # Save as GeoTIFF
+        profile = {
+            'driver': 'GTiff',
+            'dtype': rasterio.float32,
+            'nodata': 0,
+            'width': width,
+            'height': height,
+            'count': 1,
+            'crs': 'EPSG:4326',
+            'transform': transform
+        }
+        
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        
+        with rasterio.open(output_path, 'w', **profile) as dst:
+            dst.write(probability, 1)
+        
+        print(f"✅ Synthetic probability map created: {output_path}")
+        print(f"   Shape: {probability.shape}")
+        print(f"   Range: [{probability.min():.3f}, {probability.max():.3f}]")
+        print(f"   Mean: {probability.mean():.3f}")
+        
+        return True
+        
+    except ImportError:
+        print("❌ Rasterio not available, cannot create synthetic data")
+        return False
+    except Exception as e:
+        print(f"❌ Failed to create synthetic probability map: {e}")
+        return False
 
 print("✅ CA Engine utilities loaded successfully")

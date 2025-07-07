@@ -251,6 +251,78 @@ from cellular_automata.integration.ml_ca_bridge import MLCABridge
 
 ---
 
+### BUG-009: Additional Kaggle Import Issues 🔴 CRITICAL
+
+**Issue**: Additional import errors discovered during Kaggle testing
+
+```python
+⚠️ ML module import failed: No module named 'model' (from fire_prediction_model.predict import predict_fire_map)
+⚠️ CA engine import failed: cannot import name 'run_full_simulation' from 'cellular_automata.ca_engine.core'
+⚠️ CA engine import failed: cannot import name 'DEFAULT_WEATHER_PARAMS' from 'cellular_automata.ca_engine.config'
+```
+
+**Root Cause**: Multiple issues:
+1. ML predict.py uses relative imports that fail in Kaggle environment
+2. `run_full_simulation` was a class method, not module-level function
+3. `DEFAULT_WEATHER_PARAMS` constant didn't exist in config
+
+**Impact**: Kaggle notebook completely non-functional for demonstration
+
+**Files Affected**:
+- `/fire_prediction_model/predict.py` (lines 1-5)
+- `/cellular_automata/ca_engine/core.py` (missing module-level function)
+- `/cellular_automata/ca_engine/config.py` (missing constant)
+
+**Solution Applied**:
+
+1. **Fixed ML Import Issues**:
+```python
+# Added robust import handling in predict.py
+try:
+    from .model.resunet_a import build_resunet_a
+except ImportError:
+    try:
+        from model.resunet_a import build_resunet_a
+    except ImportError:
+        # Fallback for different directory structures
+        import sys, os
+        current_dir = os.path.dirname(__file__)
+        model_dir = os.path.join(current_dir, 'model')
+        if model_dir not in sys.path:
+            sys.path.insert(0, model_dir)
+        from resunet_a import build_resunet_a
+```
+
+2. **Added Module-Level CA Functions**:
+```python
+# Added run_full_simulation as module-level function in core.py
+def run_full_simulation(probability_map_path: str, ignition_points: List, ...):
+    ca_engine = ForestFireCA(use_gpu=True)
+    # ... implementation
+```
+
+3. **Added Missing Config Constants**:
+```python
+# Added to config.py
+DEFAULT_WEATHER_PARAMS = {
+    'wind_direction': 45, 'wind_speed': 15, 'temperature': 30, 'relative_humidity': 40
+}
+```
+
+4. **Enhanced Notebook Error Handling**:
+```python
+# Added graceful fallbacks in notebook imports
+try:
+    from cellular_automata.ca_engine.config import DEFAULT_WEATHER_PARAMS, WIND_DIRECTIONS
+except ImportError:
+    # Provide fallback values
+    DEFAULT_WEATHER_PARAMS = {...}
+```
+
+**Status**: ✅ FIXED - All import issues resolved with robust error handling
+
+---
+
 ## Bug Fix Implementation Plan
 
 ### Phase 1: Critical Fixes (Immediate)

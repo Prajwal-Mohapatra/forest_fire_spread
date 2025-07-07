@@ -379,4 +379,53 @@ def run_quick_simulation(probability_map_path: str,
     
     return results
 
+# Convenience function for full simulations (module-level function)
+def run_full_simulation(probability_map_path: str,
+                       ignition_points: List[Tuple[float, float]],
+                       weather_params: Dict[str, float] = None,
+                       simulation_hours: int = 6,
+                       save_frames: bool = True,
+                       output_dir: str = None) -> Dict:
+    """
+    Run a complete fire simulation with all features.
+    This is a module-level wrapper for the ForestFireCA.run_full_simulation method.
+    
+    Args:
+        probability_map_path: Path to ML probability map
+        ignition_points: List of ignition coordinates
+        weather_params: Weather conditions (optional)
+        simulation_hours: Simulation duration
+        save_frames: Whether to save hourly frames
+        output_dir: Output directory
+        
+    Returns:
+        Complete simulation results
+    """
+    # Default weather parameters
+    if weather_params is None:
+        weather_params = {
+            'wind_direction': 45,  # Northeast
+            'wind_speed': 15,      # 15 km/h
+            'temperature': 30,     # 30°C
+            'relative_humidity': 40 # 40%
+        }
+    
+    # Create CA engine
+    ca_engine = ForestFireCA(use_gpu=True)
+    
+    # Load probability map
+    if not ca_engine.load_base_probability_map(probability_map_path):
+        raise ValueError(f"Failed to load probability map: {probability_map_path}")
+    
+    # Run full simulation
+    results = ca_engine.run_full_simulation(
+        ignition_points=ignition_points,
+        weather_params=weather_params,
+        simulation_hours=simulation_hours,
+        save_frames=save_frames,
+        output_dir=output_dir
+    )
+    
+    return results
+
 print("✅ Cellular Automata core engine loaded successfully")

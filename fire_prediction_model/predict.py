@@ -1,8 +1,23 @@
 import rasterio
 import numpy as np
-from model.resunet_a import build_resunet_a
 import tensorflow as tf
 from tqdm import tqdm
+
+# Handle relative imports for both local and external usage
+try:
+    from .model.resunet_a import build_resunet_a
+except ImportError:
+    try:
+        from model.resunet_a import build_resunet_a
+    except ImportError:
+        # Fallback for when imported from different directory structures
+        import sys
+        import os
+        current_dir = os.path.dirname(__file__)
+        model_dir = os.path.join(current_dir, 'model')
+        if model_dir not in sys.path:
+            sys.path.insert(0, model_dir)
+        from resunet_a import build_resunet_a
 
 def predict_fire_map(tif_path, model_path, output_path, patch_size=256):
     model = build_resunet_a(input_shape=(patch_size, patch_size, 9))

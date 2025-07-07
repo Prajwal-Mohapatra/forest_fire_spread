@@ -199,3 +199,11 @@ SIMULATION_SCENARIOS = {
 
 # Default enhanced configuration instance
 DEFAULT_ADVANCED_CONFIG = AdvancedCAConfig()
+
+# Default weather parameters for convenience
+DEFAULT_WEATHER_PARAMS = {
+    'wind_direction': 45,    # Northeast wind (degrees)
+    'wind_speed': 15,        # 15 km/h
+    'temperature': 30,       # 30°C
+    'relative_humidity': 40  # 40%
+}

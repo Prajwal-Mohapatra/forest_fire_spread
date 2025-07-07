@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forest Fire Simulation - The Minions | Bharatiya Antariksh Hackathon 2025</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Main Container -->
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="team-info">
+                <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Team Logo" class="team-logo" />
+                <div class="team-details">
+                    <h1 class="team-name">The Minions</h1>
+                </div>
+            </div>
+            <div class="hackathon-title">
+                <h2>Bharatiya Antariksh Hackathon 2025</h2>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Left Sidebar - Controls -->
+            <aside class="controls-sidebar">
+                <!-- Ignition Controls Section -->
+                <section class="control-section" id="ignition-controls">
+                    <h3 class="section-title">Ignition Controls</h3>
+                    
+                    <!-- Click to Ignite Toggle -->
+                    <div class="toggle-control">
+                        <label class="toggle-label">Click to Ignite Mode</label>
+                        <div class="toggle-switch" id="ignite-mode-toggle">
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </div>
+
+                    <!-- Active Ignition Points -->
+                    <div class="ignition-points-container">
+                        <h4 class="subsection-title">Active Ignition Points</h4>
+                        <div class="ignition-points-list" id="ignition-points-list">
+                            <!-- Ignition points will be dynamically added here -->
+                        </div>
+                        <button class="btn btn-secondary" id="clear-ignitions-btn">Clear All Ignitions</button>
+                    </div>
+
+                    <!-- Ignition Intensity Slider -->
+                    <div class="slider-control">
+                        <div class="slider-header">
+                            <label class="slider-label">Ignition Intensity</label>
+                            <span class="slider-value" id="ignition-intensity-value">50</span>
+                        </div>
+                        <input type="range" class="slider" id="ignition-intensity-slider" min="10" max="100" value="50" step="5">
+                    </div>
+                </section>
+
+                <!-- Simulation Parameters Section -->
+                <section class="control-section" id="simulation-params">
+                    <h3 class="section-title">Simulation Parameters</h3>
+                    
+                    <!-- Date Selection -->
+                    <div class="input-group">
+                        <label class="input-label">Simulation Date</label>
+                        <select class="input-field" id="simulation-date">
+                            <option value="2016-05-15">May 15, 2016</option>
+                            <option value="2016-05-20">May 20, 2016</option>
+                            <option value="2016-05-25">May 25, 2016</option>
+                        </select>
+                    </div>
+
+                    <!-- Wind Parameters -->
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label class="input-label">Wind Speed (km/h)</label>
+                            <input type="number" class="input-field" id="wind-speed" value="15" min="0" max="100" step="2.5">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Wind Direction (degrees)</label>
+                            <input type="number" class="input-field" id="wind-direction" value="45" min="0" max="360" step="15">
+                        </div>
+                    </div>
+
+                    <!-- Temperature and Humidity -->
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label class="input-label">Temperature (°C)</label>
+                            <input type="number" class="input-field" id="temperature" value="30" min="15" max="45" step="1">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Humidity (%)</label>
+                            <input type="number" class="input-field" id="humidity" value="40" min="10" max="80" step="5">
+                        </div>
+                    </div>
+
+                    <!-- Simulation Duration -->
+                    <div class="input-group">
+                        <label class="input-label">Duration (hours)</label>
+                        <select class="input-field" id="simulation-duration">
+                            <option value="1">1 hour</option>
+                            <option value="2">2 hours</option>
+                            <option value="3">3 hours</option>
+                            <option value="6" selected>6 hours</option>
+                            <option value="12">12 hours</option>
+                        </select>
+                    </div>
+
+                    <!-- Simulation Speed Slider -->
+                    <div class="slider-control">
+                        <div class="slider-header">
+                            <label class="slider-label">Simulation Speed (x)</label>
+                            <span class="slider-value" id="sim-speed-value">1</span>
+                        </div>
+                        <input type="range" class="slider" id="sim-speed-slider" min="0.5" max="4" value="1" step="0.5">
+                    </div>
+
+                    <!-- Advanced Parameters -->
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label class="input-label">Resolution</label>
+                            <select class="input-field" id="resolution">
+                                <option value="30m" selected>30m</option>
+                                <option value="60m">60m</option>
+                                <option value="100m">100m</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label class="input-label">Physics Model</label>
+                            <select class="input-field" id="physics-model">
+                                <option value="enhanced" selected>Enhanced CA</option>
+                                <option value="basic">Basic CA</option>
+                                <option value="ml-enhanced">ML Enhanced</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Demo Scenarios Section -->
+                <section class="control-section" id="demo-scenarios">
+                    <h3 class="section-title">Demo Scenarios</h3>
+                    
+                    <div class="demo-scenarios">
+                        <button class="btn-demo" data-demo="dehradun">
+                            <span class="demo-icon">🏔️</span>
+                            <div class="demo-info">
+                                <div class="demo-name">Dehradun Valley Fire</div>
+                                <div class="demo-desc">Simulates fire spread in Dehradun valley terrain</div>
+                            </div>
+                        </button>
+                        
+                        <button class="btn-demo" data-demo="rishikesh">
+                            <span class="demo-icon">🌊</span>
+                            <div class="demo-info">
+                                <div class="demo-name">Rishikesh Forest Fire</div>
+                                <div class="demo-desc">Forest fire near Rishikesh with river barriers</div>
+                            </div>
+                        </button>
+                        
+                        <button class="btn-demo" data-demo="nainital">
+                            <span class="demo-icon">⛰️</span>
+                            <div class="demo-info">
+                                <div class="demo-name">Nainital Hill Fire</div>
+                                <div class="demo-desc">High altitude fire simulation near Nainital</div>
+                            </div>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Layer Toggles Section -->
+                <section class="control-section" id="layer-toggles">
+                    <h3 class="section-title">Layer Toggles</h3>
+                    
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="checkbox" id="layer-probability" checked>
+                            <span class="checkbox-text">Fire Probability Layer</span>
+                        </label>
+                        
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="checkbox" id="layer-fire-spread" checked>
+                            <span class="checkbox-text">Current Fire Spread</span>
+                        </label>
+                        
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="checkbox" id="layer-terrain">
+                            <span class="checkbox-text">Terrain/DEM Overlay</span>
+                        </label>
+                        
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="checkbox" id="layer-barriers">
+                            <span class="checkbox-text">Roads/Barriers</span>
+                        </label>
+                        
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="checkbox" id="layer-weather">
+                            <span class="checkbox-text">Weather Data Overlay</span>
+                        </label>
+                    </div>
+                </section>
+
+                <!-- Animation Controls Section -->
+                <section class="control-section" id="animation-controls">
+                    <h3 class="section-title">Animation Controls</h3>
+                    
+                    <!-- Playback Controls -->
+                    <div class="button-group">
+                        <button class="btn btn-animation" id="play-btn">Play</button>
+                        <button class="btn btn-animation" id="pause-btn">Pause</button>
+                        <button class="btn btn-animation" id="stop-btn">Stop</button>
+                    </div>
+
+                    <!-- Timeline Scrubber -->
+                    <div class="slider-control">
+                        <div class="slider-header">
+                            <label class="slider-label">Timeline Scrubber</label>
+                            <span class="slider-value" id="timeline-value">0</span>
+                        </div>
+                        <input type="range" class="slider" id="timeline-slider" min="0" max="6" value="0" step="1">
+                    </div>
+
+                    <!-- Speed Controls -->
+                    <div class="button-group">
+                        <button class="btn btn-speed" data-speed="1">1x</button>
+                        <button class="btn btn-speed" data-speed="2">2x</button>
+                        <button class="btn btn-speed" data-speed="4">4x</button>
+                    </div>
+
+                    <!-- Frame Controls -->
+                    <div class="button-group">
+                        <button class="btn btn-frame" id="frame-back-btn">Frame Back</button>
+                        <button class="btn btn-frame" id="frame-forward-btn">Frame Forward</button>
+                    </div>
+
+                    <!-- Start Simulation Button -->
+                    <div class="action-section">
+                        <button class="btn btn-primary" id="start-simulation-btn">
+                            🚀 Start Simulation
+                        </button>
+                    </div>
+                </section>
+            </aside>
+
+            <!-- Main Visualization Area -->
+            <main class="visualization-area">
+                <!-- Map Container -->
+                <div class="map-container">
+                    <div class="map-display" id="map-display">
+                        <!-- Leaflet map will be initialized here -->
+                    </div>
+                    <div class="map-overlay">
+                        <div class="coordinates-display" id="coordinates-display">
+                            Lat: ---, Lon: ---
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Section -->
+                <div class="progress-section" id="progress-section" style="display: none;">
+                    <div class="progress-header">
+                        <h4 class="progress-title">Simulation Progress</h4>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill"></div>
+                        </div>
+                        <span class="progress-percentage" id="progress-percentage">0%</span>
+                    </div>
+                </div>
+
+                <!-- Timeline Section -->
+                <div class="timeline-section" id="timeline-section" style="display: none;">
+                    <div class="timeline-container">
+                        <div class="timeline-item">
+                            <div class="timeline-label">Start:</div>
+                            <div class="timeline-time" id="timeline-start">00:00</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-label">Ignition:</div>
+                            <div class="timeline-time" id="timeline-ignition">00:00</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-label">Rapid Spread:</div>
+                            <div class="timeline-time" id="timeline-rapid">00:00</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-label">Containment:</div>
+                            <div class="timeline-time" id="timeline-containment">00:00</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-label">End:</div>
+                            <div class="timeline-time" id="timeline-end">00:00</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div class="results-section" id="results-section" style="display: none;">
+                    <h3 class="section-title">Simulation Results</h3>
+                    
+                    <div class="results-grid">
+                        <div class="result-card">
+                            <div class="result-label">Total Area Burned</div>
+                            <div class="result-value" id="result-area">0 hectares</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-label">Average Fire Intensity</div>
+                            <div class="result-value" id="result-intensity">0 kW/m</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-label">Simulation Time</div>
+                            <div class="result-value" id="result-time">0 hours</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics Section -->
+                <div class="statistics-section" id="statistics-section" style="display: none;">
+                    <h3 class="section-title">Real-time Statistics</h3>
+                    
+                    <div class="charts-container">
+                        <div class="chart-wrapper">
+                            <canvas id="area-chart"></canvas>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="intensity-chart"></canvas>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="progress-chart"></canvas>
+                        </div>
+                        <div class="chart-wrapper" style="display: none;">
+                            <canvas id="comparison-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="export-section">
+                        <button class="btn btn-primary" id="export-results-btn">Export Results</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Running Fire Simulation...</div>
+            <div class="loading-details" id="loading-details">Initializing parameters...</div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div class="modal" id="error-modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>⚠️ Error</h3>
+                <button class="modal-close" id="error-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="error-message">An error occurred during simulation.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="error-modal-ok">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal" id="success-modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>✅ Success</h3>
+                <button class="modal-close" id="success-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="success-message">Simulation completed successfully!</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="success-modal-ok">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/config.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ui-components.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/map-handler.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/simulation-manager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chart-handler.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

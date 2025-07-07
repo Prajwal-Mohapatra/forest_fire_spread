@@ -32,7 +32,7 @@ cellular_automata/
 
 ### 2. Duplicate Implementation (REMOVED)
 
-**Location**: `d:\Projects (Bigul)\forest_fire_spread\forest_fire_ml\fire_pred_model\cellular_automata\`
+**Location**: `d:\Projects (Bigul)\forest_fire_spread\forest_fire_ml\\cellular_automata\`
 **Status**: Prototype implementation with some advanced features
 **Structure** (before removal):
 
@@ -170,7 +170,7 @@ Any code that previously imported from the duplicate folder should be updated:
 
 ```python
 # OLD (remove these)
-from forest_fire_ml.fire_pred_model.cellular_automata import ...
+from forest_fire_ml..cellular_automata import ...
 
 # NEW (use these)
 from cellular_automata.ca_engine import ...

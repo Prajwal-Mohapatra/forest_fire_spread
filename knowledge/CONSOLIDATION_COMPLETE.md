@@ -169,10 +169,10 @@ forest_fire_spread/
 
 ```python
 # ✅ CORRECT - Use these imports going forward
-from forest_fire_ml.fire_pred_model.predict import predict_fire_probability
-from forest_fire_ml.fire_pred_model.model.resunet_a import build_resunet_a
-from forest_fire_ml.fire_pred_model.utils.metrics import iou_score, dice_coef, focal_loss
-from forest_fire_ml.fire_pred_model.utils.preprocess import normalize_patch
+from forest_fire_ml..predict import predict_fire_probability
+from forest_fire_ml..model.resunet_a import build_resunet_a
+from forest_fire_ml..utils.metrics import iou_score, dice_coef, focal_loss
+from forest_fire_ml..utils.preprocess import normalize_patch
 
 # ❌ OLD - These no longer exist
 # from forest_fire_ml.predict import predict_fire_map

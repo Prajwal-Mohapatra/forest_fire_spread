@@ -229,10 +229,10 @@ from utils.visualize import create_fire_animation, plot_fire_progression
 
 ```python
 # ✅ These match actual working implementation structure
-from forest_fire_ml.fire_pred_model.predict import predict_fire_probability
-from forest_fire_ml.fire_pred_model.model.resunet_a import build_resunet_a
-from forest_fire_ml.fire_pred_model.utils.metrics import iou_score, dice_coef, focal_loss
-from forest_fire_ml.fire_pred_model.utils.preprocess import normalize_patch
+from forest_fire_ml..predict import predict_fire_probability
+from forest_fire_ml..model.resunet_a import build_resunet_a
+from forest_fire_ml..utils.metrics import iou_score, dice_coef, focal_loss
+from forest_fire_ml..utils.preprocess import normalize_patch
 from cellular_automata.ca_engine.core import ForestFireCA, run_quick_simulation, run_full_simulation
 from cellular_automata.ca_engine.utils import setup_tensorflow_gpu, load_probability_map, create_fire_animation_data
 from cellular_automata.ca_engine.config import DEFAULT_WEATHER_PARAMS, WIND_DIRECTIONS
@@ -334,13 +334,13 @@ except ImportError:
 **Issue**: After project restructuring, new import errors discovered in forest_fire_ml package
 
 ```python
-❌ ML predict imports failed: No module named 'forest_fire_ml.fire_pred_model'
+❌ ML predict imports failed: No module named 'forest_fire_ml.'
 ```
 
 **Root Cause**: Multiple issues after restructuring:
 
 1. Missing `__init__.py` files in forest_fire_ml package structure
-2. Kaggle notebook using incorrect import paths (`forest_fire_ml.fire_pred_model.*` instead of `forest_fire_ml.*`)
+2. Kaggle notebook using incorrect import paths (`forest_fire_ml..*` instead of `forest_fire_ml.*`)
 3. Relative imports in `predict.py` failing when imported as module
 
 **Impact**: Complete failure of ML integration and Kaggle notebook functionality
@@ -378,7 +378,7 @@ except ImportError:
 ```python
 # Corrected imports in Forest_Fire_CA_Simulation_Kaggle.ipynb
 # Before (incorrect):
-from forest_fire_ml.fire_pred_model.predict import predict_fire_probability
+from forest_fire_ml..predict import predict_fire_probability
 
 # After (correct):
 from forest_fire_ml.predict import predict_fire_probability, predict_fire_map, load_model_safe

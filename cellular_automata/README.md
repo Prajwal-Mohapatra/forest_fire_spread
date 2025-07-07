@@ -229,7 +229,7 @@ prediction = predict_fire_probability(
 
 ```python
 # Generate ML prediction
-from forest_fire_ml.fire_pred_model.predict import predict_fire_probability
+from forest_fire_ml..predict import predict_fire_probability
 
 # Predict fire probability for specific date
 prob_map_path = predict_fire_probability(

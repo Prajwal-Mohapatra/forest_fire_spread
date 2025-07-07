@@ -40,7 +40,7 @@ forest_fire_ml/dataset/__init__.py
 
 ```python
 # Fixed Kaggle notebook imports:
-# Before: from forest_fire_ml.fire_pred_model.predict import predict_fire_probability
+# Before: from forest_fire_ml..predict import predict_fire_probability
 # After:  from forest_fire_ml.predict import predict_fire_probability, predict_fire_map, load_model_safe
 ```
 

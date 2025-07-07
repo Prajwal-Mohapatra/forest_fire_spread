@@ -163,7 +163,7 @@ def test_ml_integration():
         # Check if ML model files exist
         project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
         ml_model_path = os.path.join(
-            project_root, "forest_fire_ml", "fire_pred_model", "outputs", "final_model.h5"
+            project_root, "forest_fire_ml", "", "outputs", "final_model.h5"
         )
         
         if os.path.exists(ml_model_path):

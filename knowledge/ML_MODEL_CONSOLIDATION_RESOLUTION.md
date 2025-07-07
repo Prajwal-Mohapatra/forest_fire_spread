@@ -131,9 +131,9 @@ from forest_fire_ml.model.resunet_a import build_resunet_a
 from forest_fire_ml.utils.metrics import iou_score, dice_coef
 
 # NEW - Use these imports
-from forest_fire_ml.fire_pred_model.predict import predict_fire_probability
-from forest_fire_ml.fire_pred_model.model.resunet_a import build_resunet_a
-from forest_fire_ml.fire_pred_model.utils.metrics import iou_score, dice_coef, focal_loss
+from forest_fire_ml..predict import predict_fire_probability
+from forest_fire_ml..model.resunet_a import build_resunet_a
+from forest_fire_ml..utils.metrics import iou_score, dice_coef, focal_loss
 ```
 
 #### 3. Architecture Cleanup ✅
@@ -183,7 +183,7 @@ class MLCABridge:
     def find_model(self):
         model_paths = [
             # Only working implementation paths remain
-            os.path.join(project_root, "forest_fire_ml", "fire_pred_model", "outputs", "final_model.h5"),
+            os.path.join(project_root, "forest_fire_ml", "", "outputs", "final_model.h5"),
         ]
 ```
 
@@ -192,7 +192,7 @@ class MLCABridge:
 ```python
 # Forest_Fire_CA_Simulation_Kaggle.ipynb
 # Updated all imports to use working implementation
-from forest_fire_ml.fire_pred_model.predict import predict_fire_probability
+from forest_fire_ml..predict import predict_fire_probability
 ```
 
 ### Quality Assurance
@@ -233,7 +233,7 @@ from forest_fire_ml.fire_pred_model.predict import predict_fire_probability
 
 ```python
 # Standard ML prediction workflow
-from forest_fire_ml.fire_pred_model.predict import predict_fire_probability
+from forest_fire_ml..predict import predict_fire_probability
 
 # Run prediction with all advanced features
 results = predict_fire_probability(

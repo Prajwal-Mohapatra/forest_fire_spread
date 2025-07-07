@@ -16,7 +16,7 @@ import json
 # Add project paths
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(project_root)
-sys.path.append(os.path.join(project_root, "forest_fire_ml", "fire_pred_model"))
+sys.path.append(os.path.join(project_root, "forest_fire_ml", ""))
 
 class MLCABridge:
     """

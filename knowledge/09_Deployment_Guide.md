@@ -206,7 +206,7 @@ print(f'Model loaded successfully: {model.input_shape} -> {model.output_shape}')
 #### Test ML Prediction Pipeline
 
 ```bash
-cd forest_fire_ml/fire_pred_model
+cd forest_fire_ml/
 
 # Test with sample data
 python predict.py --input data/stacked_datasets/stack_2016_05_15.tif \

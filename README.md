@@ -502,15 +502,15 @@ State-of-the-Art Comparison:
 - **Open Source Community** - TensorFlow, React, Leaflet, and other frameworks
 - **Research Community** - Foundation papers and methodological guidance
 
+
 ### References
 
-1. Diakogiannis, F. I., et al. (2020). ResUNet-a: A deep learning framework for semantic segmentation of remotely sensed data. _ISPRS Journal of Photogrammetry and Remote Sensing_, 162, 94-114.
+1. Diakogiannis, F. I., Waldner, F., Caccetta, P., & Wu, C. (2020). ResUNet-a: A deep learning framework for semantic segmentation of remotely sensed data. _ISPRS Journal of Photogrammetry and Remote Sensing_, 162, 94-114. https://doi.org/10.1016/j.isprsjprs.2020.01.013
 
-2. Huot, F., et al. (2022). Next day wildfire spread: A machine learning dataset to predict wildfire spreading from remote-sensing data. _IEEE Transactions on Geoscience and Remote Sensing_, 60, 1-13.
+2. Huot, F., Hu, R. L., Goyal, N., Sankar, T., Ihme, M., & Chen, Y. F. (2022). Next day wildfire spread: A machine learning dataset to predict wildfire spreading from remote-sensing data. _IEEE Transactions on Geoscience and Remote Sensing_, 60, 1-13. https://doi.org/10.1109/TGRS.2022.3192974
 
-3. Karafyllidis, I., & Thanailakis, A. (1997). A model for predicting forest fire spreading using cellular automata. _Ecological Modelling_, 99(1), 87-97.
+3. Karafyllidis, I., & Thanailakis, A. (1997). A model for predicting forest fire spreading using cellular automata. _Ecological Modelling_, 99(1), 87-97. https://doi.org/10.1016/S0304-3800(96)01942-4
 
-4. United Nations. (2015). Transforming our world: The 2030 Agenda for Sustainable Development. https://sdgs.un.org/2030agenda
+4. United Nations, Department of Economic and Social Affairs - Sustainable Development. (2015). Transforming our world: The 2030 Agenda for Sustainable Development (A/RES/70/1). https://sdgs.un.org/2030agenda
 
-5. Forest Survey of India. (2023). _India State of Forest Report 2023_. Ministry of Environment, Forest and Climate Change, Government of India.
-
+5. Forest Survey of India. (2023). _India State of Forest Report 2023_. Ministry of Environment, Forest and Climate Change, Government of India. https://fsi.nic.in/forest-report-2023

@@ -1,4 +1,4 @@
-# 🔥 Forest Fire Spread Simulation System
+# Forest Fire Spread Simulation System
 
 _Comprehensive AI-Powered Forest Fire Prediction & Spread Simulation Platform_
 
@@ -17,75 +17,41 @@ _Comprehensive AI-Powered Forest Fire Prediction & Spread Simulation Platform_
 **Target Region:** Uttarakhand, India (April-May 2016 fire season)  
 **Innovation:** Novel ML-CA hybrid approach with real-time interactive simulation
 
-### 🌟 Project Highlights
+### Project Highlights
 
-- **🎯 94.2% ML Accuracy** - ResUNet-A model with IoU=0.82, Dice=0.857
-- **⚡ Real-time Simulation** - GPU-accelerated TensorFlow-based cellular automata
-- **🗺️ High Resolution** - 30m spatial resolution across 400×500 km region
-- **🌐 Interactive Interface** - Professional web application with ISRO-themed design
-- **🔄 End-to-End Pipeline** - <5 minutes from raw data to interactive visualization
-- **📊 Multi-Scenario Analysis** - Compare different ignition patterns and weather conditions
+- **84.2% ML Accuracy** - ResUNet-A model with IoU=0.82, Dice=0.857
+- **Real-time Simulation** - GPU-accelerated TensorFlow-based cellular automata
+- **High Resolution** - 30m spatial resolution across 400×500 km region
+- **Interactive Interface** - Professional web application with ISRO-themed design
+- **End-to-End Pipeline** - <5 minutes from raw data to interactive visualization
+- **Multi-Scenario Analysis** - Compare different ignition patterns and weather conditions
 
-### 📁 Project Resources
+### Project Resources
 
-- **🏠 Main Repository:** [Forest Fire Spread System](https://github.com/Prajwal-Mohapatra/forest_fire_spread)
-- **🧠 ML Submodule:** [ResUNet-A Implementation](https://github.com/Prajwal-Mohapatra/forest_fire_ml)
-- **📊 Kaggle Datasets:** Stacked & Unstacked Uttarakhand Fire Data (Private)
-- **🎨 Design System:** [ISRO-themed UI Wireframes](https://www.figma.com/design/YeS8pwYnDU9ZhLxeAP6ZHH/ISRO-BAH-Hackathon-2025?node-id=0-1&t=EEjAIq96FQ77oQAR-1)
-- **📚 Knowledge Base:** [Comprehensive Documentation](./knowledge/)
+- **Main Repository:** [Forest Fire Spread System](https://github.com/Prajwal-Mohapatra/forest_fire_spread)
+- **ML Submodule:** [ResUNet-A Implementation](https://github.com/Prajwal-Mohapatra/forest_fire_ml)
+- **Kaggle Datasets:** Stacked & Unstacked Uttarakhand Fire Data (Private)
+- **Design System:** [ISRO-themed UI Wireframes](https://www.figma.com/design/YeS8pwYnDU9ZhLxeAP6ZHH/ISRO-BAH-Hackathon-2025?node-id=0-1&t=EEjAIq96FQ77oQAR-1)
+- **Knowledge Base:** [Comprehensive Documentation](./knowledge/)
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ### Core Innovation: ML-CA Hybrid Pipeline
-
-```mermaid
-graph LR
-    A[Multi-source Data] --> B[ResUNet-A ML Model]
-    B --> C[Fire Probability Maps]
-    C --> D[Cellular Automata Engine]
-    D --> E[Web Interface]
-    E --> F[Interactive Visualization]
-
-    subgraph "Data Sources"
-        A1[SRTM DEM]
-        A2[ERA5 Weather]
-        A3[LULC 2020]
-        A4[GHSL 2015]
-        A5[VIIRS Fires]
-    end
-
-    subgraph "ML Processing"
-        B1[9-band Stack]
-        B2[Patch-based Training]
-        B3[Sliding Window Prediction]
-    end
-
-    subgraph "CA Simulation"
-        D1[TensorFlow GPU]
-        D2[Physics Rules]
-        D3[Environmental Factors]
-    end
-
-    subgraph "User Interface"
-        E1[React Frontend]
-        E2[Flask API]
-        E3[Interactive Maps]
-    end
-```
+![Main Process Flow Diagram](/diagrams/Main%20Process%20Flow%20Diagram.png)
 
 ### Technical Stack Deep Dive
 
-#### 🧠 Machine Learning Component (`forest_fire_ml/`)
+#### Machine Learning Component ([`forest_fire_ml/`](/forest_fire_ml/))
 
 - **Architecture**: ResUNet-A with atrous convolutions and residual blocks
 - **Input**: 9-band environmental data (256×256 patches at 30m resolution)
 - **Training**: 2016 Uttarakhand fire season (59 daily samples)
-- **Performance**: 94.2% accuracy, IoU=0.82, focal loss for class imbalance
+- **Performance**: 84.2% accuracy, IoU=0.82, focal loss for class imbalance
 - **Output**: Daily fire probability maps (0-1 range, georeferenced GeoTIFF)
 
-#### 🔥 Cellular Automata Engine (`cellular_automata/`)
+#### Cellular Automata Engine ([`cellular_automata/`](/cellular_automata/))
 
 - **Framework**: TensorFlow 2.8+ with GPU acceleration (10x speedup)
 - **Physics**: Moore neighborhood analysis with wind/slope/barrier effects
@@ -93,14 +59,14 @@ graph LR
 - **Scalability**: Full Uttarakhand state (13,000×17,000 cells at 30m)
 - **Integration**: Seamless connection with ML probability maps
 
-#### 🌉 Integration Bridge (`cellular_automata/integration/`)
+#### Integration Bridge ([`cellular_automata/integration/`](/cellular_automata/integration/))
 
 - **Pipeline**: Automated ML prediction → CA simulation workflow
 - **Validation**: Spatial consistency checks and quality assurance
 - **Orchestration**: Multi-scenario management and batch processing
 - **API**: RESTful endpoints for web interface communication
 
-#### 🌐 Web Interface (`cellular_automata/web_interface/`)
+#### Web Interface ([`cellular_automata/web_interface/`](/cellular_automata/web_interface/))
 
 - **Frontend**: React.js with Leaflet mapping and Chart.js visualization
 - **Backend**: Flask API with 12 endpoints for complete system control
@@ -109,9 +75,9 @@ graph LR
 
 ---
 
-## ✨ Key Features & Capabilities
+## Key Features & Capabilities
 
-### 🎯 Technical Innovations
+### Technical Innovations
 
 #### Novel ML-CA Integration
 
@@ -134,7 +100,7 @@ graph LR
 - **Temporal Alignment** - precise synchronization of daily weather and satellite data
 - **Quality Validation** - automated consistency checks across all data sources
 
-### 🎮 User Experience Features
+### User Experience Features
 
 #### Interactive Simulation Controls
 
@@ -159,7 +125,7 @@ graph LR
 
 ---
 
-## 🚀 Quick Start Guide
+## Quick Start Guide
 
 ### Prerequisites
 
@@ -190,9 +156,7 @@ python -c "import tensorflow as tf; print('GPU:', tf.config.list_physical_device
 ### 2. Download Pre-trained Model
 
 ```bash
-# Download from trained model repository
-cd forest_fire_ml/outputs/
-wget https://github.com/Prajwal-Mohapatra/forest_fire_ml/releases/download/v1.0/final_model.h5
+# Download from trained model repository (private, will open to public, after hackathon, if permitted)
 ```
 
 ### 3. Quick ML Prediction
@@ -209,48 +173,15 @@ prob_map_path = predict_fire_probability(
 print(f"Prediction saved: {prob_map_path}")
 ```
 
-### 4. Run CA Simulation
-
-```python
-from cellular_automata.ca_engine import run_quick_simulation
-
-# 6-hour fire spread simulation
-results = run_quick_simulation(
-    probability_map_path=prob_map_path,
-    ignition_points=[(77.5, 30.2)],  # Dehradun coordinates
-    weather_params={
-        'wind_direction': 225,  # Southwest wind
-        'wind_speed': 15,       # km/h
-        'temperature': 32,      # Celsius
-        'relative_humidity': 35 # percent
-    },
-    simulation_hours=6
-)
-
-# Display results
-print(f"Final burned area: {results['statistics']['burned_area_ha']:.1f} hectares")
-```
-
-### 5. Launch Web Interface
-
-```bash
-# Start Flask backend
-cd cellular_automata/web_interface
-python app.py
-
-# Open browser to http://localhost:5000
-# Use interactive interface for real-time simulation
-```
-
 ---
 
-## 📊 Technical Specifications
+## Technical Specifications
 
 ### System Performance Metrics
 
 | Metric                  | Value       | Notes                          |
 | ----------------------- | ----------- | ------------------------------ |
-| **ML Accuracy**         | 94.2%       | Validation on 2016 fire season |
+| **ML Accuracy**         | 84.2%       | Validation on 2016 fire season |
 | **IoU Score**           | 0.82        | Fire detection quality         |
 | **Dice Coefficient**    | 0.857       | Segmentation accuracy          |
 | **Spatial Coverage**    | 400×500 km  | Full Uttarakhand state         |
@@ -287,147 +218,7 @@ python app.py
 
 ---
 
-## 📖 Usage Examples
-
-### Advanced ML-CA Pipeline
-
-```python
-from cellular_automata.integration.ml_ca_bridge import MLCABridge
-
-# Initialize integrated pipeline
-bridge = MLCABridge(
-    ml_model_path="forest_fire_ml/outputs/final_model.h5",
-    ca_config={
-        'use_gpu': True,
-        'wind_effect_strength': 0.3,
-        'slope_effect_strength': 0.2
-    }
-)
-
-# Run integrated simulation
-results = bridge.run_integrated_simulation(
-    input_data_path="data/stacked_2016_05_23.tif",
-    ignition_points=[(77.5, 30.2), (77.6, 30.3)],
-    weather_params={
-        'wind_direction': 180,  # South wind
-        'wind_speed': 25,       # Strong wind
-        'temperature': 38,      # High temperature
-        'relative_humidity': 25 # Low humidity
-    },
-    simulation_hours=12,
-    output_dir="outputs/scenario_extreme_weather"
-)
-
-# Analyze results
-print(f"Scenario: Extreme weather conditions")
-print(f"Total burned area: {results['final_burned_area_ha']:.1f} hectares")
-print(f"Peak spread rate: {results['peak_spread_rate_ha_hr']:.2f} ha/hour")
-print(f"Fire containment: {results['containment_probability']:.1%}")
-```
-
-### Multi-Scenario Comparison
-
-```python
-from cellular_automata.ca_engine import ForestFireCA
-
-# Initialize CA engine
-ca = ForestFireCA(use_gpu=True)
-ca.load_base_probability_map("outputs/fire_probability_2016_05_23.tif")
-
-# Define scenarios
-scenarios = {
-    'single_ignition': {
-        'points': [(77.5, 30.2)],
-        'weather': {'wind_speed': 10, 'wind_direction': 90}
-    },
-    'multiple_ignition': {
-        'points': [(77.5, 30.2), (77.6, 30.1), (77.4, 30.3)],
-        'weather': {'wind_speed': 10, 'wind_direction': 90}
-    },
-    'high_wind': {
-        'points': [(77.5, 30.2)],
-        'weather': {'wind_speed': 30, 'wind_direction': 225}
-    }
-}
-
-# Run comparison
-comparison_results = {}
-for scenario_name, config in scenarios.items():
-    print(f"Running scenario: {scenario_name}")
-
-    scenario_id = ca.initialize_simulation(
-        ignition_points=config['points'],
-        weather_params=config['weather'],
-        simulation_hours=6
-    )
-
-    # Run simulation
-    final_state, final_stats = None, None
-    for hour in range(6):
-        final_state, final_stats = ca.step_simulation()
-
-    comparison_results[scenario_name] = {
-        'final_burned_area': final_stats['burned_area_ha'],
-        'peak_intensity': final_stats['max_intensity'],
-        'spread_pattern': final_state
-    }
-
-# Compare results
-for name, results in comparison_results.items():
-    print(f"{name}: {results['final_burned_area']:.1f} ha burned")
-```
-
-### Web API Integration
-
-```python
-import requests
-import json
-
-# Start simulation via API
-api_url = "http://localhost:5000/api"
-
-simulation_request = {
-    "date": "2016_05_23",
-    "ignition_points": [
-        {"lat": 30.2, "lon": 77.5, "intensity": 0.8}
-    ],
-    "weather": {
-        "wind_speed": 15,
-        "wind_direction": 225,
-        "temperature": 32,
-        "humidity": 35
-    },
-    "duration": 6
-}
-
-# Submit simulation
-response = requests.post(f"{api_url}/simulate", json=simulation_request)
-simulation_id = response.json()['simulation_id']
-
-# Monitor progress
-while True:
-    status_response = requests.get(f"{api_url}/simulation/{simulation_id}/status")
-    status = status_response.json()
-
-    if status['status'] == 'completed':
-        # Get results
-        results_response = requests.get(f"{api_url}/simulation/{simulation_id}/results")
-        results = results_response.json()
-
-        print(f"Simulation completed:")
-        print(f"Burned area: {results['final_burned_area_ha']:.1f} hectares")
-        print(f"Animation frames: {len(results['animation_frames'])}")
-        break
-    elif status['status'] == 'failed':
-        print(f"Simulation failed: {status['error']}")
-        break
-
-    time.sleep(5)  # Check every 5 seconds
-```
-
----
-
-## 🎥 Demo & Results
+## Demo & Results
 
 ### Interactive Demonstrations
 
@@ -457,7 +248,7 @@ while True:
 
 ```
 ResUNet-A Performance on 2016 Uttarakhand Fire Season:
-├── Validation Accuracy: 94.2%
+├── Validation Accuracy: 84.2%
 ├── IoU Score: 0.82
 ├── Dice Coefficient: 0.857
 ├── Precision: 0.89 (fire detection)
@@ -552,40 +343,40 @@ GET  /api/export-results/{id}       # Export simulation results
 
 ```
 forest_fire_spread/
-├── 📚 knowledge/                    # Comprehensive documentation
+├── knowledge/                    # Comprehensive documentation
 │   ├── README.md                   # Knowledge base overview
 │   ├── 01_ML_Model_Documentation.md
 │   ├── 02_CA_Engine_Documentation.md
 │   └── ... [complete documentation suite]
-├── 🧠 forest_fire_ml/              # ML model implementation (submodule)
-│   ├── model/                      # ResUNet-A architecture
-│   ├── utils/                      # Preprocessing and metrics
-│   ├── outputs/                    # Trained models and results
-│   └── predict.py                  # Main prediction pipeline
-├── 🔥 cellular_automata/           # CA engine and integration
+├── forest_fire_ml/              # ML model implementation (submodule)
+│   ├── model/                      
+│   ├── utils/                      
+│   ├── outputs/                    
+│   └── predict.py                  
+├── cellular_automata/           # CA engine and integration
 │   ├── ca_engine/                  # Core simulation engine
-│   │   ├── core.py                 # Main ForestFireCA class
-│   │   ├── rules.py                # Fire spread physics
-│   │   ├── utils.py                # Utilities and GPU functions
-│   │   └── config.py               # Configuration parameters
+│   │   ├── core.py                 
+│   │   ├── rules.py                
+│   │   ├── utils.py                
+│   │   └── config.py               
 │   ├── integration/                # ML-CA bridge
-│   │   └── ml_ca_bridge.py         # Pipeline orchestration
+│   │   └── ml_ca_bridge.py         
 │   └── web_interface/              # Web application
-│       ├── app.py                  # Flask backend
-│       ├── api.py                  # REST API endpoints
-│       ├── frontend/               # React.js application
-│       └── static/                 # Legacy web assets
-├── 📊 datasets/                    # Training and test data
-│   ├── dataset_stacked/            # Multi-band GeoTIFF files
-│   └── dataset_unstacked/          # Individual layer files
-├── 📓 *.ipynb                      # Jupyter demonstration notebooks
-├── 📋 requirements.txt             # Python dependencies
-└── 🔧 setup scripts and configs
+│       ├── app.py                  
+│       ├── api.py                  
+│       ├── frontend/               
+│       └── static/                 
+├── datasets/                    # Training and test data
+│   ├── dataset_stacked/            
+│   └── dataset_unstacked/          
+├── *.ipynb                      # Jupyter demonstration notebooks
+├── requirements.txt             
+└── setup scripts and configs
 ```
 
 ---
 
-## 🔬 Research & Validation
+## Research & Validation
 
 ### Scientific Methodology
 
@@ -616,7 +407,7 @@ forest_fire_spread/
 
 ```
 Classification Performance:
-├── Overall Accuracy: 94.2%
+├── Overall Accuracy: 84.2%
 ├── Fire Detection (Class 1):
 │   ├── Precision: 0.89
 │   ├── Recall: 0.84
@@ -680,341 +471,29 @@ State-of-the-Art Comparison:
 
 ---
 
-## 🚀 Future Roadmap
+## Project Links & Resources
 
-### Short-term Enhancements (Q3-Q4 2025)
+### Main Resources
 
-#### Cloud Infrastructure Deployment
+- **Main Repository**: [github.com/Prajwal-Mohapatra/forest_fire_spread](https://github.com/Prajwal-Mohapatra/forest_fire_spread)
+- **ML Submodule**: [github.com/Prajwal-Mohapatra/forest_fire_ml](https://github.com/Prajwal-Mohapatra/forest_fire_ml)
+- **Documentation**: [Knowledge Base](./knowledge/)
+- **Design System**: [Figma Wireframes](https://www.figma.com/design/YeS8pwYnDU9ZhLxeAP6ZHH/ISRO-BAH-Hackathon-2025)
 
-- **Containerization** - Docker and Kubernetes deployment
-- **Auto-scaling** - Dynamic resource allocation based on demand
-- **Multi-user Support** - Concurrent simulation capability
-- **API Rate Limiting** - Production-grade service management
+### Datasets & Models
 
-#### Advanced Visualization
+- **Kaggle Datasets**: Stacked & Unstacked Uttarakhand Fire Data (Private)
+- **Pre-trained Models**: Available in releases section
+- **Sample Data**: Test datasets for quick start
 
-- **3D Terrain Visualization** - Enhanced topographic representation
-- **Time-series Analysis** - Historical fire pattern analysis
-- **Real-time Streaming** - Live fire progression updates
-- **Mobile Responsiveness** - Tablet and smartphone optimization
+### ISRO BAH Hackathon 2025
 
-#### Data Pipeline Automation
-
-- **Automated Data Collection** - Scheduled satellite data acquisition
-- **Real-time Weather Integration** - Live meteorological data feeds
-- **Quality Assurance** - Automated data validation and cleaning
-- **Version Control** - Data versioning and provenance tracking
-
-### Medium-term Vision (2026)
-
-#### Multi-Region Expansion
-
-- **Transfer Learning** - Adaptation to other fire-prone regions
-- **Multi-scale Modeling** - Global to local scale integration
-- **Cross-regional Validation** - Performance across different ecosystems
-- **International Collaboration** - Data sharing and model exchange
-
-#### Advanced AI Integration
-
-- **Ensemble Methods** - Multiple model combination for robustness
-- **Active Learning** - Continuous model improvement with new data
-- **Explainable AI** - Interpretable fire risk factors
-- **Uncertainty Quantification** - Confidence bounds and risk assessment
-
-#### Operational Integration
-
-- **Fire Department Integration** - Direct connection to emergency services
-- **Early Warning Systems** - Automated alert generation
-- **Resource Optimization** - Firefighting resource allocation
-- **Policy Support** - Evidence-based fire management recommendations
-
-### Long-term Goals (2027+)
-
-#### Research Leadership
-
-- **Academic Publications** - High-impact journal publications
-- **Conference Presentations** - International fire research conferences
-- **Open Science** - Public dataset and model sharing
-- **Education Integration** - University curriculum development
-
-#### Societal Impact
-
-- **Operational Deployment** - National fire management system
-- **International Adoption** - Global fire prediction network
-- **Climate Change Adaptation** - Future scenario modeling
-- **Sustainable Development** - SDG contribution tracking
+- **Team**: The Minions
+- **Problem Statement**: Simulation/Modelling of Forest Fire Spread using AI/ML
+- **Innovation**: First ML-CA hybrid system for forest fire prediction in India
+- **Impact**: Production-ready system for operational fire management
 
 ---
-
-## 🛠️ Installation & Setup
-
-### System Requirements
-
-#### Minimum Requirements
-
-- **OS**: Ubuntu 18.04+, Windows 10+, or macOS 10.15+
-- **RAM**: 8GB (16GB recommended)
-- **Storage**: 50GB free space
-- **GPU**: Optional (NVIDIA GPU with 4GB+ VRAM recommended)
-- **Network**: Broadband internet for data downloads
-
-#### Recommended Configuration
-
-- **OS**: Ubuntu 20.04 LTS or Windows 11
-- **RAM**: 32GB for optimal performance
-- **Storage**: 100GB+ SSD storage
-- **GPU**: NVIDIA RTX 3060+ or Tesla T4+ (8GB+ VRAM)
-- **CPU**: 8+ cores (Intel i7/AMD Ryzen 7 or better)
-
-### Quick Installation
-
-```bash
-# 1. Clone repository and submodules
-git clone https://github.com/Prajwal-Mohapatra/forest_fire_spread.git
-cd forest_fire_spread
-git submodule update --init --recursive
-
-# 2. Create conda environment
-conda create -n fire_simulation python=3.9
-conda activate fire_simulation
-
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Verify GPU setup (optional)
-python -c "import tensorflow as tf; print('GPU Available:', len(tf.config.list_physical_devices('GPU')) > 0)"
-
-# 5. Download pre-trained model
-cd forest_fire_ml/outputs/
-wget https://github.com/Prajwal-Mohapatra/forest_fire_ml/releases/download/v1.0/final_model.h5
-
-# 6. Test installation
-cd ../../
-python -c "from forest_fire_ml.predict import predict_fire_probability; print('✅ Installation successful!')"
-```
-
-### Docker Deployment
-
-```dockerfile
-# Dockerfile for production deployment
-FROM tensorflow/tensorflow:2.8.0-gpu
-
-WORKDIR /app
-COPY . /app
-
-RUN pip install -r requirements.txt
-RUN apt-get update && apt-get install -y gdal-bin
-
-EXPOSE 5000
-CMD ["python", "cellular_automata/web_interface/app.py"]
-```
-
-```bash
-# Build and run Docker container
-docker build -t forest-fire-simulation .
-docker run -p 5000:5000 --gpus all forest-fire-simulation
-```
-
-### Cloud Deployment (AWS)
-
-```yaml
-# docker-compose.yml for AWS deployment
-version: "3.8"
-services:
-  fire-simulation:
-    build: .
-    ports:
-      - "80:5000"
-    environment:
-      - FLASK_ENV=production
-      - GPU_ENABLED=true
-    volumes:
-      - ./data:/app/data
-      - ./outputs:/app/outputs
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-```
-
-### Troubleshooting
-
-#### Common Issues
-
-**GPU Not Detected**
-
-```bash
-# Check NVIDIA driver
-nvidia-smi
-
-# Install CUDA toolkit
-sudo apt install nvidia-cuda-toolkit
-
-# Verify TensorFlow GPU
-python -c "import tensorflow as tf; tf.config.list_physical_devices('GPU')"
-```
-
-**Memory Errors**
-
-```bash
-# Reduce batch size in configuration
-export TF_FORCE_GPU_ALLOW_GROWTH=true
-
-# Monitor memory usage
-nvidia-smi -l 1
-```
-
-**Installation Failures**
-
-```bash
-# Update pip and setuptools
-pip install --upgrade pip setuptools
-
-# Install with verbose output
-pip install -r requirements.txt -v
-
-# Use conda for problematic packages
-conda install -c conda-forge rasterio geopandas
-```
-
----
-
-## 🤝 Contributing & Development
-
-### Development Guidelines
-
-#### Code Standards
-
-- **Python Style**: PEP 8 compliance with Black formatting
-- **Documentation**: Comprehensive docstrings and type hints
-- **Testing**: Unit tests for all major functions
-- **Version Control**: Feature branches with descriptive commit messages
-
-#### Contributing Process
-
-1. **Fork Repository** - Create personal fork for development
-2. **Feature Branch** - Create branch for specific feature/bugfix
-3. **Development** - Implement changes with tests and documentation
-4. **Pull Request** - Submit PR with detailed description
-5. **Code Review** - Address reviewer feedback
-6. **Merge** - Integration into main branch
-
-#### Development Setup
-
-```bash
-# Development environment setup
-git clone https://github.com/your-username/forest_fire_spread.git
-cd forest_fire_spread
-
-# Install development dependencies
-pip install -r requirements-dev.txt
-
-# Install pre-commit hooks
-pre-commit install
-
-# Run tests
-pytest tests/ -v
-
-# Run linting
-flake8 .
-black .
-```
-
-### Testing Framework
-
-#### Unit Tests
-
-```bash
-# Run ML model tests
-pytest forest_fire_ml/tests/ -v
-
-# Run CA engine tests
-pytest cellular_automata/tests/ -v
-
-# Run integration tests
-pytest tests/integration/ -v
-
-# Coverage report
-pytest --cov=. --cov-report=html
-```
-
-#### Performance Tests
-
-```bash
-# Benchmark ML prediction
-python tests/benchmark_ml.py
-
-# Benchmark CA simulation
-python tests/benchmark_ca.py
-
-# End-to-end performance test
-python tests/benchmark_e2e.py
-```
-
-### Architecture Extension
-
-#### Adding New Data Sources
-
-```python
-# Example: Adding new environmental layer
-class NewDataSource:
-    def __init__(self, config):
-        self.config = config
-
-    def process_data(self, date, bounds):
-        # Implement data processing
-        return processed_array
-
-    def validate_data(self, data):
-        # Implement validation logic
-        return is_valid
-```
-
-#### Custom Fire Physics
-
-```python
-# Example: Adding custom fire spread rules
-class CustomFireRules(FireSpreadRules):
-    def calculate_spread_probability(self, current_state, weather):
-        # Implement custom physics
-        base_prob = super().calculate_spread_probability(current_state, weather)
-        custom_modifier = self.calculate_custom_effects()
-        return base_prob * custom_modifier
-```
-
----
-
-## 📄 License & Citation
-
-### License
-
-This project is released under the MIT License. See [LICENSE](./LICENSE) file for details.
-
-```
-MIT License
-
-Copyright (c) 2025 The Minions Team - Forest Fire Simulation Project
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files...
-```
-
-### Citation
-
-If you use this system in your research, please cite:
-
-```bibtex
-@software{forest_fire_simulation_2025,
-  title={Forest Fire Spread Simulation System: ML-CA Hybrid Approach},
-  author={The Minions Team},
-  year={2025},
-  url={https://github.com/Prajwal-Mohapatra/forest_fire_spread},
-  note={ISRO BAH Hackathon 2025 Submission}
-}
-```
 
 ### Acknowledgments
 
@@ -1035,32 +514,3 @@ If you use this system in your research, please cite:
 
 5. Forest Survey of India. (2023). _India State of Forest Report 2023_. Ministry of Environment, Forest and Climate Change, Government of India.
 
----
-
-## 🔗 Project Links & Resources
-
-### 🌐 Main Resources
-
-- **🏠 Main Repository**: [github.com/Prajwal-Mohapatra/forest_fire_spread](https://github.com/Prajwal-Mohapatra/forest_fire_spread)
-- **🧠 ML Submodule**: [github.com/Prajwal-Mohapatra/forest_fire_ml](https://github.com/Prajwal-Mohapatra/forest_fire_ml)
-- **📚 Documentation**: [Knowledge Base](./knowledge/)
-- **🎨 Design System**: [Figma Wireframes](https://www.figma.com/design/YeS8pwYnDU9ZhLxeAP6ZHH/ISRO-BAH-Hackathon-2025)
-
-### 📊 Datasets & Models
-
-- **Kaggle Datasets**: Stacked & Unstacked Uttarakhand Fire Data (Private)
-- **Pre-trained Models**: Available in releases section
-- **Sample Data**: Test datasets for quick start
-
-### 🎯 ISRO BAH Hackathon 2025
-
-- **Team**: The Minions
-- **Problem Statement**: Simulation/Modelling of Forest Fire Spread using AI/ML
-- **Innovation**: First ML-CA hybrid system for forest fire prediction in India
-- **Impact**: Production-ready system for operational fire management
-
----
-
-**🔥 Join us in advancing forest fire management through cutting-edge AI technology! 🔥**
-
-_Developed with precision and passion by The Minions team for ISRO BAH Hackathon 2025_

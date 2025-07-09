@@ -1,21 +1,17 @@
-# Data files and directories
-datasets/
-dataset_stacked/
-dataset_unstacked/
-success_runs/
+# =============================================================================
+# FOREST FIRE PREDICTION SYSTEM - GITIGNORE
+# =============================================================================
+# Updated for unified project structure with ML, CA, and Web components
+# Date: 2025-01-08
 
-# Jupyter notebooks
-dataset_stacking.ipynb
-.ipynb_checkpoints/
-*-checkpoint.ipynb
-
-# Python
+# =============================================================================
+# PYTHON
+# =============================================================================
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-env/
 build/
 develop-eggs/
 dist/
@@ -31,33 +27,88 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
-# ML model outputs
-# Old implementation removed - using forest_fire_ml/ only
-# forest_fire_ml/outputs/
+# Virtual Environments
+venv/
+ENV/
+env/
+.env
+.venv
+
+# =============================================================================
+# JUPYTER NOTEBOOKS
+# =============================================================================
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+# Keep main notebooks for development, but ignore checkpoints
+
+# =============================================================================
+# ML MODEL FILES & OUTPUTS
+# =============================================================================
+# Model files (keep final trained models but ignore training artifacts)
+forest_fire_ml/outputs/logs/
+forest_fire_ml/outputs/plots/
+forest_fire_ml/outputs/predictions/
+forest_fire_ml/outputs/*.h5.bak/
+forest_fire_ml/outputs/synthetic_*.tif
+
+# Model artifacts
 *.h5
 *.hdf5
 *.pkl
 *.model
-
-# Logs and temporary files
-logs/
-*.log
-resample_log.txt
-tmp/
-.DS_Store
-.vscode/
-
-# Virtual Environment
-venv/
-ENV/
-env/
+*.weights
+*.ckpt
+*.ckpt.*
+*.pb
+*.pth
+*.pt
 
 # TensorFlow/Keras
 .keras/
 tensorflow_logs/
+tensorboard_logs/
+tf_logs/
 
-# Raster and GIS data
+# =============================================================================
+# CELLULAR AUTOMATA OUTPUTS
+# =============================================================================
+cellular_automata/outputs/
+local_simulation_outputs/
+cellular_automata/uploads/
+
+# CA simulation files
+synthetic_*.tif
+web_sim_*/
+sim_*/
+session_*/
+
+# =============================================================================
+# WEB INTERFACE
+# =============================================================================
+# React/Node.js
+cellular_automata/web_interface/frontend/node_modules/
+cellular_automata/web_interface/frontend/build/
+cellular_automata/web_interface/frontend/.env
+cellular_automata/web_interface/frontend/npm-debug.log*
+cellular_automata/web_interface/frontend/yarn-debug.log*
+cellular_automata/web_interface/frontend/yarn-error.log*
+
+# Static files and uploads
+cellular_automata/web_interface/static/uploads/
+cellular_automata/web_interface/static/temp/
+
+# =============================================================================
+# DATASETS & DATA FILES
+# =============================================================================
+# Large dataset directories
+datasets/
+dataset_stacked/
+dataset_unstacked/
+success_runs/
+
+# GIS and raster data
 *.tif
 *.tiff
 *.shp
@@ -67,13 +118,105 @@ tensorflow_logs/
 *.sbn
 *.sbx
 *.xml
+*.aux.xml
+*.tfw
+*.prj
+*.cpg
 
 # Large data archives
 *.zip
 *.tar
 *.gz
 *.rar
+*.7z
+*.bz2
 
-# Google Colab
+# =============================================================================
+# LOGS & TEMPORARY FILES
+# =============================================================================
+logs/
+*.log
+resample_log.txt
+tmp/
+temp/
+.tmp/
+.temp/
+
+# API and server logs
+flask_*.log
+gunicorn_*.log
+celery_*.log
+api_*.log
+
+# =============================================================================
+# IDE & EDITOR FILES
+# =============================================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# =============================================================================
+# OS FILES
+# =============================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# =============================================================================
+# GOOGLE COLAB & CLOUD
+# =============================================================================
 .config/
 .local/
+.colab/
+
+# =============================================================================
+# DEVELOPMENT & TESTING
+# =============================================================================
+# Test outputs
+test_outputs/
+test_results/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Development environment
+.envrc
+.direnv/
+
+# =============================================================================
+# SENSITIVE FILES
+# =============================================================================
+# API keys and credentials
+.env
+.env.local
+.env.production
+.env.staging
+secrets.json
+config.json
+credentials.json
+
+# =============================================================================
+# BACKUP FILES
+# =============================================================================
+*.bak
+*.backup
+*.old
+*~
+.#*
+
+# =============================================================================
+# PROJECT SPECIFIC
+# =============================================================================
+# Ignore specific large output directories but keep structure
+knowledge/temp/
+outputs_archive/

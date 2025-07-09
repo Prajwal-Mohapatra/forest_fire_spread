@@ -19,7 +19,7 @@ import json
 _gpu_configured = False
 
 def setup_tensorflow_gpu():
-    """Configure TensorFlow for optimal GPU usage."""
+    """Configure TensorFlow for optimal GPU usage with robust fallback to CPU."""
     global _gpu_configured
     
     # Check if already configured
@@ -32,20 +32,52 @@ def setup_tensorflow_gpu():
             print("⚠️ No GPU found, using CPU")
             return False
     
-    gpus = tf.config.experimental.list_physical_devices('GPU')
-    if gpus:
-        try:
-            for gpu in gpus:
-                tf.config.experimental.set_memory_growth(gpu, True)
-            print(f"✅ GPU configured: {len(gpus)} device(s) available")
+    try:
+        # Disable GPU JIT compilation to avoid libdevice issues
+        os.environ['TF_XLA_FLAGS'] = '--tf_xla_enable_xla_devices=false'
+        os.environ['XLA_FLAGS'] = '--xla_gpu_cuda_data_dir=/usr/local/cuda'
+        
+        # Configure TensorFlow logging to reduce CUDA warnings
+        os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'  # Suppress INFO messages
+        
+        # Try to configure GPUs
+        gpus = tf.config.experimental.list_physical_devices('GPU')
+        if gpus:
+            try:
+                # Enable memory growth to prevent allocation issues
+                for gpu in gpus:
+                    tf.config.experimental.set_memory_growth(gpu, True)
+                
+                # Disable XLA JIT compilation that requires libdevice
+                tf.config.optimizer.set_jit(False)
+                
+                # Test GPU functionality with a simple operation
+                with tf.device('/GPU:0'):
+                    test_tensor = tf.constant([1.0, 2.0, 3.0])
+                    test_result = tf.sqrt(test_tensor)  # This was failing before
+                    # Force execution to test if GPU actually works
+                    _ = test_result.numpy()
+                
+                print(f"✅ GPU configured successfully: {len(gpus)} device(s) available")
+                print("✅ GPU test operation completed successfully")
+                _gpu_configured = True
+                return True
+                
+            except Exception as gpu_error:
+                print(f"⚠️ GPU configuration failed, falling back to CPU: {gpu_error}")
+                # Force CPU-only execution
+                tf.config.set_visible_devices([], 'GPU')
+                print("✅ TensorFlow configured for CPU-only execution")
+                _gpu_configured = True
+                return False
+        else:
+            print("ℹ️ No GPU devices found, using CPU")
             _gpu_configured = True
-            return True
-        except RuntimeError as e:
-            print(f"⚠️ GPU setup failed: {e}")
-            _gpu_configured = True  # Mark as attempted to avoid repeated failures
             return False
-    else:
-        print("⚠️ No GPU found, using CPU")
+            
+    except Exception as e:
+        print(f"⚠️ TensorFlow setup failed: {e}")
+        print("✅ Falling back to default TensorFlow configuration")
         _gpu_configured = True
         return False
 

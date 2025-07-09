@@ -1,0 +1,81 @@
+/* Documentation page specific styles */
+
+.documentation-page {
+	min-height: 100vh;
+	background: var(--color-background-gradient);
+	color: var(--color-text);
+	font-family: "Roboto", sans-serif;
+}
+
+.documentation-content {
+	max-width: 900px;
+	margin: 0 auto;
+	padding: 2rem 1rem;
+}
+
+.documentation-content .card {
+	margin-bottom: 2rem;
+}
+
+.documentation-content h2 {
+	color: var(--color-primary);
+	margin-bottom: 1.5rem;
+	border-bottom: 1px solid var(--color-accent-border);
+	padding-bottom: 0.5rem;
+}
+
+.documentation-content h3 {
+	color: var(--color-text);
+	margin: 1.5rem 0 0.75rem;
+	font-weight: 500;
+}
+
+.documentation-content p {
+	margin-bottom: 1rem;
+	line-height: 1.7;
+}
+
+.documentation-content ul {
+	margin-bottom: 1.5rem;
+	padding-left: 1.5rem;
+}
+
+.documentation-content li {
+	margin-bottom: 0.5rem;
+	line-height: 1.6;
+}
+
+.documentation-content strong {
+	color: var(--color-primary-light);
+}
+
+.documentation-footer {
+	text-align: center;
+	padding: 2rem;
+	margin-top: 3rem;
+	border-top: 1px solid var(--color-border);
+}
+
+.documentation-footer a {
+	color: var(--color-primary);
+	margin-left: 1rem;
+	text-decoration: none;
+}
+
+.documentation-footer a:hover {
+	text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+	.documentation-content {
+		padding: 1rem;
+	}
+
+	.documentation-content h2 {
+		font-size: 1.5rem;
+	}
+
+	.documentation-content h3 {
+		font-size: 1.2rem;
+	}
+}

@@ -19,12 +19,29 @@ class FireSpreadRules:
     
     def __init__(self, use_gpu: bool = True):
         self.use_gpu = use_gpu
-        if use_gpu:
-            self.device = '/GPU:0' if tf.config.list_physical_devices('GPU') else '/CPU:0'
-        else:
+        
+        # Test GPU availability and fallback gracefully
+        try:
+            if use_gpu and tf.config.list_physical_devices('GPU'):
+                # Test GPU with a simple operation to detect CUDA issues
+                with tf.device('/GPU:0'):
+                    test_tensor = tf.constant([1.0, 2.0, 3.0])
+                    test_result = tf.sqrt(test_tensor)
+                    _ = test_result.numpy()  # Force execution
+                
+                self.device = '/GPU:0'
+                self.use_gpu = True
+                print(f"✅ FireSpreadRules initialized on {self.device}")
+            else:
+                raise Exception("GPU not available or not requested")
+                
+        except Exception as e:
+            print(f"⚠️ GPU initialization failed ({e}), falling back to CPU")
             self.device = '/CPU:0'
-            
-        print(f"✅ FireSpreadRules initialized on {self.device}")
+            self.use_gpu = False
+            # Disable XLA JIT to prevent CUDA errors
+            tf.config.optimizer.set_jit(False)
+            print(f"✅ FireSpreadRules initialized on {self.device}")
     
     def calculate_spread_probability(self, 
                                    current_state: tf.Tensor,
@@ -40,43 +57,48 @@ class FireSpreadRules:
         - Weather conditions (wind, moisture)
         """
         
-        with tf.device(self.device):
-            # Get grid dimensions
-            height, width = tf.shape(current_state)[0], tf.shape(current_state)[1]
-            
-            # Initialize spread probability grid
-            spread_prob = tf.zeros_like(current_state, dtype=tf.float32)
-            
-            # Neighborhood influence calculation
-            neighbor_influence = self._calculate_neighborhood_influence(
-                current_state, weather_params
-            )
-            
-            # Environmental modifiers
-            env_modifier = self._calculate_environmental_modifier(
-                environmental_layers, weather_params
-            )
-            
-            # Temporal decay factor (fire intensity decreases over time)
-            temporal_factor = self._calculate_temporal_factor(current_state, time_step)
-            
-            # Combine all factors
-            spread_prob = (
-                base_probability * 
-                neighbor_influence * 
-                env_modifier * 
-                temporal_factor
-            )
-            
-            # Apply barriers (roads, water bodies, settlements)
-            if 'barriers' in environmental_layers:
-                barrier_mask = environmental_layers['barriers']
-                spread_prob = spread_prob * (1.0 - barrier_mask * BARRIER_RESISTANCE)
-            
-            # Ensure probabilities are in valid range
-            spread_prob = tf.clip_by_value(spread_prob, 0.0, 1.0)
-            
-            return spread_prob
+        try:
+            with tf.device(self.device):
+                # Get grid dimensions
+                height, width = tf.shape(current_state)[0], tf.shape(current_state)[1]
+                
+                # Initialize spread probability grid
+                spread_prob = tf.zeros_like(current_state, dtype=tf.float32)
+                
+                # Neighborhood influence calculation
+                neighbor_influence = self._calculate_neighborhood_influence(
+                    current_state, weather_params
+                )
+                
+                # Environmental modifiers
+                env_modifier = self._calculate_environmental_modifier(
+                    environmental_layers, weather_params
+                )
+                
+                # Temporal decay factor (fire intensity decreases over time)
+                temporal_factor = self._calculate_temporal_factor(current_state, time_step)
+                
+                # Combine all factors
+                spread_prob = (
+                    base_probability * 
+                    neighbor_influence * 
+                    env_modifier * 
+                    temporal_factor
+                )
+                
+                # Apply barriers (roads, water bodies, settlements)
+                if 'barriers' in environmental_layers:
+                    barrier_mask = environmental_layers['barriers']
+                    spread_prob = spread_prob * (1.0 - barrier_mask * BARRIER_RESISTANCE)
+                
+                # Ensure probabilities are in valid range
+                spread_prob = tf.clip_by_value(spread_prob, 0.0, 1.0)
+                
+                return spread_prob
+                
+        except Exception as e:
+            print(f"⚠️ GPU calculation failed, falling back to simplified CPU calculation: {e}")
+            return self._fallback_cpu_calculation(current_state, base_probability, weather_params)
     
     def _calculate_neighborhood_influence(self, 
                                         current_state: tf.Tensor,
@@ -236,45 +258,50 @@ class FireSpreadRules:
             Updated fire state grid
         """
         
-        with tf.device(self.device):
-            # Start with current state
-            new_state = tf.identity(current_state)
-            
-            # Add new ignitions if provided
-            if ignition_mask is not None:
-                new_state = tf.maximum(new_state, ignition_mask)
-            
-            # Apply spread probabilities
-            # Fire spreads to cells based on calculated probabilities
-            spread_mask = tf.greater(spread_probability, SPREAD_THRESHOLD)
-            random_values = tf.random.uniform(tf.shape(spread_probability))
-            
-            # Probabilistic spreading
-            new_fires = tf.logical_and(
-                spread_mask,
-                tf.less(random_values, spread_probability)
-            )
-            
-            # Update state where new fires occur
-            new_fire_intensity = spread_probability * 0.8  # New fires start at 80% intensity
-            new_state = tf.where(
-                new_fires,
-                tf.maximum(new_state, new_fire_intensity),
-                new_state
-            )
-            
-            # Apply burning threshold
-            new_state = tf.where(
-                tf.greater(new_state, BURNING_THRESHOLD),
-                new_state,
-                tf.zeros_like(new_state)
-            )
-            
-            # Gradual intensity decay for existing fires
-            decay_factor = 0.95  # 5% decay per time step
-            new_state = new_state * decay_factor
-            
-            return tf.clip_by_value(new_state, 0.0, 1.0)
+        try:
+            with tf.device(self.device):
+                # Start with current state
+                new_state = tf.identity(current_state)
+                
+                # Add new ignitions if provided
+                if ignition_mask is not None:
+                    new_state = tf.maximum(new_state, ignition_mask)
+                
+                # Apply spread probabilities
+                # Fire spreads to cells based on calculated probabilities
+                spread_mask = tf.greater(spread_probability, SPREAD_THRESHOLD)
+                random_values = tf.random.uniform(tf.shape(spread_probability))
+                
+                # Probabilistic spreading
+                new_fires = tf.logical_and(
+                    spread_mask,
+                    tf.less(random_values, spread_probability)
+                )
+                
+                # Update state where new fires occur
+                new_fire_intensity = spread_probability * 0.8  # New fires start at 80% intensity
+                new_state = tf.where(
+                    new_fires,
+                    tf.maximum(new_state, new_fire_intensity),
+                    new_state
+                )
+                
+                # Apply burning threshold
+                new_state = tf.where(
+                    tf.greater(new_state, BURNING_THRESHOLD),
+                    new_state,
+                    tf.zeros_like(new_state)
+                )
+                
+                # Gradual intensity decay for existing fires
+                decay_factor = 0.95  # 5% decay per time step
+                new_state = new_state * decay_factor
+                
+                return tf.clip_by_value(new_state, 0.0, 1.0)
+                
+        except Exception as e:
+            print(f"⚠️ GPU state update failed, using CPU fallback: {e}")
+            return self._fallback_state_update(current_state, spread_probability, ignition_mask)
     
     def apply_suppression_effects(self, 
                                  fire_state: tf.Tensor,
@@ -456,3 +483,87 @@ class SimplifiedFireRules:
         modified_state = fire_state * flammability_map
         
         return modified_state
+
+    def _fallback_cpu_calculation(self, 
+                                 current_state: tf.Tensor,
+                                 base_probability: tf.Tensor,
+                                 weather_params: Dict[str, float]) -> tf.Tensor:
+        """
+        Simplified CPU-based calculation as fallback when GPU fails.
+        Uses basic operations that don't require CUDA libdevice.
+        """
+        # Convert to CPU and perform simplified calculation
+        with tf.device('/CPU:0'):
+            # Simple convolution for neighbor influence
+            kernel = tf.constant([
+                [0.1, 0.2, 0.1],
+                [0.2, 0.0, 0.2],
+                [0.1, 0.2, 0.1]
+            ], dtype=tf.float32)
+            
+            # Reshape for convolution
+            current_expanded = tf.expand_dims(tf.expand_dims(current_state, 0), -1)
+            kernel_expanded = tf.expand_dims(tf.expand_dims(kernel, -1), -1)
+            
+            # Simple convolution without JIT compilation
+            neighbor_influence = tf.nn.conv2d(
+                current_expanded, 
+                kernel_expanded, 
+                strides=[1, 1, 1, 1], 
+                padding='SAME'
+            )
+            neighbor_influence = tf.squeeze(neighbor_influence)
+            
+            # Basic environmental modifier
+            wind_speed = weather_params.get('wind_speed', 10)
+            humidity = weather_params.get('relative_humidity', 50)
+            temperature = weather_params.get('temperature', 25)
+            
+            env_modifier = (
+                (1.0 + wind_speed / 100.0) *  # Wind boost
+                (1.0 - humidity / 200.0) *    # Humidity reduction
+                (1.0 + (temperature - 20) / 100.0)  # Temperature boost
+            )
+            
+            # Combine factors using basic operations
+            spread_prob = (
+                base_probability * 
+                (1.0 + neighbor_influence * 0.5) * 
+                env_modifier
+            )
+            
+            # Clamp values
+            spread_prob = tf.clip_by_value(spread_prob, 0.0, 1.0)
+            
+            return spread_prob
+    
+    def _fallback_state_update(self,
+                              current_state: tf.Tensor,
+                              spread_probability: tf.Tensor,
+                              ignition_mask: tf.Tensor = None) -> tf.Tensor:
+        """
+        Simplified CPU-based state update as fallback.
+        """
+        with tf.device('/CPU:0'):
+            # Start with current state
+            new_state = tf.identity(current_state)
+            
+            # Add new ignitions if provided
+            if ignition_mask is not None:
+                new_state = tf.maximum(new_state, ignition_mask)
+            
+            # Simple threshold-based spreading (no random operations that might fail)
+            spread_mask = tf.greater(spread_probability, SPREAD_THRESHOLD * 2)  # Higher threshold for safety
+            new_fire_intensity = spread_probability * 0.7
+            
+            new_state = tf.where(
+                spread_mask,
+                tf.maximum(new_state, new_fire_intensity),
+                new_state
+            )
+            
+            # Simple decay
+            decay_factor = 0.9
+            new_state = new_state * decay_factor
+            
+            return tf.clip_by_value(new_state, 0.0, 1.0)

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Forest Fire Simulation Demo</title>
+		<style>
+			body {
+				font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+				margin: 0;
+				padding: 20px;
+				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+				color: white;
+				min-height: 100vh;
+			}
+			.container {
+				max-width: 1200px;
+				margin: 0 auto;
+				background: rgba(255, 255, 255, 0.1);
+				border-radius: 15px;
+				padding: 30px;
+				backdrop-filter: blur(10px);
+			}
+			h1 {
+				text-align: center;
+				margin-bottom: 30px;
+				font-size: 2.5em;
+				text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+			}
+			.api-test {
+				background: rgba(255, 255, 255, 0.2);
+				border-radius: 10px;
+				padding: 20px;
+				margin: 20px 0;
+			}
+			.button {
+				background: #ff6b6b;
+				color: white;
+				border: none;
+				padding: 12px 24px;
+				border-radius: 8px;
+				cursor: pointer;
+				font-size: 16px;
+				transition: all 0.3s ease;
+				margin: 10px;
+			}
+			.button:hover {
+				background: #ff5252;
+				transform: translateY(-2px);
+			}
+			.response {
+				background: rgba(0, 0, 0, 0.3);
+				border-radius: 8px;
+				padding: 15px;
+				margin-top: 15px;
+				font-family: "Courier New", monospace;
+				white-space: pre-wrap;
+				max-height: 300px;
+				overflow-y: auto;
+			}
+			.nav-links {
+				text-align: center;
+				margin-top: 30px;
+			}
+			.nav-links a {
+				color: white;
+				text-decoration: none;
+				margin: 0 15px;
+				padding: 10px 20px;
+				border: 2px solid white;
+				border-radius: 25px;
+				transition: all 0.3s ease;
+			}
+			.nav-links a:hover {
+				background: white;
+				color: #667eea;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1>🔥 Forest Fire Simulation Demo</h1>
+
+			<div class="api-test">
+				<h2>🩺 API Health Check</h2>
+				<p>Test the API connection and system status</p>
+				<button class="button" onclick="testHealthCheck()">Test Health Check</button>
+				<div id="health-response" class="response" style="display: none"></div>
+			</div>
+
+			<div class="api-test">
+				<h2>📅 Available Dates</h2>
+				<p>Get list of available simulation dates</p>
+				<button class="button" onclick="testAvailableDates()">Get Available Dates</button>
+				<div id="dates-response" class="response" style="display: none"></div>
+			</div>
+
+			<div class="api-test">
+				<h2>🚀 Quick Simulation</h2>
+				<p>Run a simple fire simulation with default parameters</p>
+				<button class="button" onclick="testQuickSimulation()">Run Quick Simulation</button>
+				<div id="simulation-response" class="response" style="display: none"></div>
+			</div>
+
+			<div class="nav-links">
+				<a href="/">← Back to Main App</a>
+				<a href="/api/health">🔗 API Health</a>
+			</div>
+		</div>
+
+		<script>
+			async function testHealthCheck() {
+				const responseDiv = document.getElementById("health-response");
+				responseDiv.style.display = "block";
+				responseDiv.textContent = "Testing health check...";
+
+				try {
+					const response = await fetch("/api/health");
+					const data = await response.json();
+					responseDiv.textContent = JSON.stringify(data, null, 2);
+				} catch (error) {
+					responseDiv.textContent = "Error: " + error.message;
+				}
+			}
+
+			async function testAvailableDates() {
+				const responseDiv = document.getElementById("dates-response");
+				responseDiv.style.display = "block";
+				responseDiv.textContent = "Fetching available dates...";
+
+				try {
+					const response = await fetch("/api/available_dates");
+					const data = await response.json();
+					responseDiv.textContent = JSON.stringify(data, null, 2);
+				} catch (error) {
+					responseDiv.textContent = "Error: " + error.message;
+				}
+			}
+
+			async function testQuickSimulation() {
+				const responseDiv = document.getElementById("simulation-response");
+				responseDiv.style.display = "block";
+				responseDiv.textContent = "Starting simulation...";
+
+				const simulationData = {
+					ignition_points: [
+						[150, 150],
+						[200, 200],
+					],
+					weather_params: {
+						wind_direction: 45,
+						wind_speed: 15,
+						temperature: 30,
+						relative_humidity: 40,
+					},
+					simulation_hours: 3,
+					use_ml_prediction: false,
+				};
+
+				try {
+					const response = await fetch("/api/simulate", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(simulationData),
+					});
+					const data = await response.json();
+					responseDiv.textContent = JSON.stringify(data, null, 2);
+				} catch (error) {
+					responseDiv.textContent = "Error: " + error.message;
+				}
+			}
+		</script>
+	</body>
+</html>

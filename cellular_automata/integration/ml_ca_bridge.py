@@ -430,6 +430,145 @@ class MLCABridge:
             print(f"❌ Synthetic demo creation failed: {e}")
         
         return None
+    
+    def get_available_dates(self) -> List[str]:
+        """
+        Get list of available dates with ML prediction data.
+        
+        Scans the dataset directories for available stacked data files.
+        
+        Returns:
+            List of date strings in YYYY_MM_DD format
+        """
+        available_dates = []
+        
+        # Check multiple possible dataset locations
+        possible_dataset_dirs = [
+            os.path.join(project_root, "datasets", "dataset_stacked"),
+            os.path.join(project_root, "dataset collection"),
+            os.path.join(project_root, "data", "stacked"),
+            os.path.join(self.ca_output_dir, "input_data")
+        ]
+        
+        for dataset_dir in possible_dataset_dirs:
+            if os.path.exists(dataset_dir):
+                try:
+                    files = os.listdir(dataset_dir)
+                    for file in files:
+                        # Look for stacked data files with date patterns
+                        if file.startswith('stack_') and file.endswith('.tif'):
+                            # Extract date from filename: stack_2016_05_15.tif -> 2016_05_15
+                            date_part = file.replace('stack_', '').replace('.tif', '')
+                            if len(date_part.split('_')) == 3:  # Validate YYYY_MM_DD format
+                                available_dates.append(date_part)
+                        elif file.startswith('stacked_data_') and file.endswith('.tif'):
+                            # Alternative naming: stacked_data_2016_05_15.tif -> 2016_05_15
+                            date_part = file.replace('stacked_data_', '').replace('.tif', '')
+                            if len(date_part.split('_')) == 3:
+                                available_dates.append(date_part)
+                except Exception as e:
+                    print(f"⚠️ Error scanning {dataset_dir}: {e}")
+                    continue
+        
+        # Remove duplicates and sort
+        available_dates = sorted(list(set(available_dates)))
+        
+        # If no dates found, provide fallback demo dates
+        if not available_dates:
+            print("⚠️ No dataset files found, using fallback demo dates")
+            available_dates = [
+                '2016_04_01', '2016_04_15', '2016_05_01', 
+                '2016_05_15', '2016_05_20', '2016_05_25'
+            ]
+        
+        print(f"📅 Found {len(available_dates)} available dates")
+        return available_dates
+    
+    def get_dataset_path_for_date(self, date_str: str) -> Optional[str]:
+        """
+        Get the dataset file path for a specific date.
+        
+        Args:
+            date_str: Date string in YYYY_MM_DD format
+            
+        Returns:
+            Path to dataset file or None if not found
+        """
+        possible_dataset_dirs = [
+            os.path.join(project_root, "datasets", "dataset_stacked"),
+            os.path.join(project_root, "dataset collection"),
+            os.path.join(project_root, "data", "stacked")
+        ]
+        
+        possible_filenames = [
+            f"stack_{date_str}.tif",
+            f"stacked_data_{date_str}.tif",
+            f"input_{date_str}.tif"
+        ]
+        
+        for dataset_dir in possible_dataset_dirs:
+            if os.path.exists(dataset_dir):
+                for filename in possible_filenames:
+                    full_path = os.path.join(dataset_dir, filename)
+                    if os.path.exists(full_path):
+                        return full_path
+        
+        return None
+    
+    def get_available_date_metadata(self) -> Dict[str, Dict]:
+        """
+        Get metadata for all available dates including file sizes and paths.
+        
+        Returns:
+            Dictionary with date metadata
+        """
+        dates = self.get_available_dates()
+        metadata = {}
+        
+        for date_str in dates:
+            dataset_path = self.get_dataset_path_for_date(date_str)
+            
+            if dataset_path and os.path.exists(dataset_path):
+                try:
+                    file_size = os.path.getsize(dataset_path)
+                    file_size_mb = file_size / (1024 * 1024)
+                    
+                    # Try to get additional info with rasterio
+                    try:
+                        import rasterio
+                        with rasterio.open(dataset_path) as src:
+                            shape = (src.height, src.width)
+                            bands = src.count
+                            crs = str(src.crs)
+                            bounds = src.bounds
+                    except:
+                        shape = None
+                        bands = None
+                        crs = None
+                        bounds = None
+                    
+                    metadata[date_str] = {
+                        'file_path': dataset_path,
+                        'file_size_mb': round(file_size_mb, 2),
+                        'available': True,
+                        'shape': shape,
+                        'bands': bands,
+                        'crs': crs,
+                        'bounds': bounds
+                    }
+                except Exception as e:
+                    metadata[date_str] = {
+                        'file_path': dataset_path,
+                        'available': False,
+                        'error': str(e)
+                    }
+            else:
+                metadata[date_str] = {
+                    'available': False,
+                    'error': 'File not found'
+                }
+        
+        return metadata
 
 # Convenience functions for quick access
 def quick_ml_ca_simulation(input_data_path: str,

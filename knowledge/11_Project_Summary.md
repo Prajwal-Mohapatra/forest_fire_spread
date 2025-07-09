@@ -10,7 +10,7 @@ The **Forest Fire Spread Simulation System** is a comprehensive, production-read
 
 ### 🎯 Primary Objectives Met
 
-- ✅ **94.2% ML Model Accuracy**: ResUNet-A architecture achieving high fire prediction accuracy
+- ✅ **0.82 IoU/Dice Coefficient**: ResUNet-A architecture achieving high fire prediction performance
 - ✅ **Real-time CA Simulation**: GPU-accelerated cellular automata with hourly time steps
 - ✅ **Professional Web Interface**: ISRO-themed interactive demonstration platform
 - ✅ **Complete Integration**: Seamless ML-CA pipeline with zero code duplication

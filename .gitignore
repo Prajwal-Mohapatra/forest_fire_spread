@@ -218,5 +218,5 @@ credentials.json
 # PROJECT SPECIFIC
 # =============================================================================
 # Ignore specific large output directories but keep structure
-knowledge/temp/
+docs/temp/
 outputs_archive/

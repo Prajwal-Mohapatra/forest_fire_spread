@@ -32,13 +32,14 @@ _Comprehensive AI-Powered Forest Fire Prediction & Spread Simulation Platform_
 - **ML Submodule:** [ResUNet-A Implementation](https://github.com/Prajwal-Mohapatra/forest_fire_ml)
 - **Kaggle Datasets:** Stacked & Unstacked Uttarakhand Fire Data (Private)
 - **Design System:** [ISRO-themed UI Wireframes](https://www.figma.com/design/YeS8pwYnDU9ZhLxeAP6ZHH/ISRO-BAH-Hackathon-2025?node-id=0-1&t=EEjAIq96FQ77oQAR-1)
-- **Knowledge Base:** [Comprehensive Documentation](./knowledge/)
+- **Knowledge Base:** [Comprehensive Documentation](./docs/)
 
 ---
 
 ## System Architecture
 
 ### Core Innovation: ML-CA Hybrid Pipeline
+
 ![Main Process Flow Diagram](/diagrams/Main%20Process%20Flow%20Diagram.png)
 
 ### Technical Stack Deep Dive
@@ -286,19 +287,19 @@ GPU Performance (RTX 3080):
 
 ### Knowledge Base Structure
 
-The `knowledge/` directory contains comprehensive documentation:
+The `docs/` directory contains comprehensive documentation:
 
-- **[01_ML_Model_Documentation.md](./knowledge/01_ML_Model_Documentation.md)** - ResUNet-A architecture and training
-- **[02_CA_Engine_Documentation.md](./knowledge/02_CA_Engine_Documentation.md)** - Cellular automata implementation
-- **[03_Integration_Bridge_Documentation.md](./knowledge/03_Integration_Bridge_Documentation.md)** - ML-CA pipeline
-- **[04_Web_Interface_Documentation.md](./knowledge/04_Web_Interface_Documentation.md)** - Frontend architecture
-- **[05_Data_Pipeline_Documentation.md](./knowledge/05_Data_Pipeline_Documentation.md)** - Data processing workflow
-- **[06_Progress_Report.md](./knowledge/06_Progress_Report.md)** - Project milestones and achievements
-- **[07_Technical_Decisions.md](./knowledge/07_Technical_Decisions.md)** - Architecture choices and rationale
-- **[08_Chat_Summary.md](./knowledge/08_Chat_Summary.md)** - Development discussions summary
-- **[09_Deployment_Guide.md](./knowledge/09_Deployment_Guide.md)** - Setup and installation instructions
-- **[10_Future_Roadmap.md](./knowledge/10_Future_Roadmap.md)** - Enhancement plan and vision
-- **[11_Project_Summary.md](./knowledge/11_Project_Summary.md)** - Complete project overview
+- **[01_ML_Model_Documentation.md](./docs/01_ML_Model_Documentation.md)** - ResUNet-A architecture and training
+- **[02_CA_Engine_Documentation.md](./docs/02_CA_Engine_Documentation.md)** - Cellular automata implementation
+- **[03_Integration_Bridge_Documentation.md](./docs/03_Integration_Bridge_Documentation.md)** - ML-CA pipeline
+- **[04_Web_Interface_Documentation.md](./docs/04_Web_Interface_Documentation.md)** - Frontend architecture
+- **[05_Data_Pipeline_Documentation.md](./docs/05_Data_Pipeline_Documentation.md)** - Data processing workflow
+- **[06_Progress_Report.md](./docs/06_Progress_Report.md)** - Project milestones and achievements
+- **[07_Technical_Decisions.md](./docs/07_Technical_Decisions.md)** - Architecture choices and rationale
+- **[08_Chat_Summary.md](./docs/08_Chat_Summary.md)** - Development discussions summary
+- **[09_Deployment_Guide.md](./docs/09_Deployment_Guide.md)** - Setup and installation instructions
+- **[10_Future_Roadmap.md](./docs/10_Future_Roadmap.md)** - Enhancement plan and vision
+- **[11_Project_Summary.md](./docs/11_Project_Summary.md)** - Complete project overview
 
 ### API Documentation
 
@@ -343,34 +344,34 @@ GET  /api/export-results/{id}       # Export simulation results
 
 ```
 forest_fire_spread/
-├── knowledge/                    # Comprehensive documentation
+├── docs/                    # Comprehensive documentation
 │   ├── README.md                   # Knowledge base overview
 │   ├── 01_ML_Model_Documentation.md
 │   ├── 02_CA_Engine_Documentation.md
 │   └── ... [complete documentation suite]
 ├── forest_fire_ml/              # ML model implementation (submodule)
-│   ├── model/                      
-│   ├── utils/                      
-│   ├── outputs/                    
-│   └── predict.py                  
+│   ├── model/
+│   ├── utils/
+│   ├── outputs/
+│   └── predict.py
 ├── cellular_automata/           # CA engine and integration
 │   ├── ca_engine/                  # Core simulation engine
-│   │   ├── core.py                 
-│   │   ├── rules.py                
-│   │   ├── utils.py                
-│   │   └── config.py               
+│   │   ├── core.py
+│   │   ├── rules.py
+│   │   ├── utils.py
+│   │   └── config.py
 │   ├── integration/                # ML-CA bridge
-│   │   └── ml_ca_bridge.py         
+│   │   └── ml_ca_bridge.py
 │   └── web_interface/              # Web application
-│       ├── app.py                  
-│       ├── api.py                  
-│       ├── frontend/               
-│       └── static/                 
+│       ├── app.py
+│       ├── api.py
+│       ├── frontend/
+│       └── static/
 ├── datasets/                    # Training and test data
-│   ├── dataset_stacked/            
-│   └── dataset_unstacked/          
+│   ├── dataset_stacked/
+│   └── dataset_unstacked/
 ├── *.ipynb                      # Jupyter demonstration notebooks
-├── requirements.txt             
+├── requirements.txt
 └── setup scripts and configs
 ```
 
@@ -477,7 +478,7 @@ State-of-the-Art Comparison:
 
 - **Main Repository**: [github.com/Prajwal-Mohapatra/forest_fire_spread](https://github.com/Prajwal-Mohapatra/forest_fire_spread)
 - **ML Submodule**: [github.com/Prajwal-Mohapatra/forest_fire_ml](https://github.com/Prajwal-Mohapatra/forest_fire_ml)
-- **Documentation**: [Knowledge Base](./knowledge/)
+- **Documentation**: [Knowledge Base](./docs/)
 - **Design System**: [Figma Wireframes](https://www.figma.com/design/YeS8pwYnDU9ZhLxeAP6ZHH/ISRO-BAH-Hackathon-2025)
 
 ### Datasets & Models
@@ -501,7 +502,6 @@ State-of-the-Art Comparison:
 - **Uttarakhand Forest Department** - Domain expertise and validation
 - **Open Source Community** - TensorFlow, React, Leaflet, and other frameworks
 - **Research Community** - Foundation papers and methodological guidance
-
 
 ### References
 

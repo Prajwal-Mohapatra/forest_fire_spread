@@ -123,26 +123,26 @@ I'm facing the following merge conflict. How should I resolve it while maintaini
 ### **SOP-016: Detailed Project Documentation**
 
 ```
-Based on the code and our discussions, analyze the code again, in detail, generate a folder, named `knowledge` in the root folder (if already present, add on to it) and add the following documentation in as much detail as possible:
+Based on the code and our discussions, analyze the code again, in detail, generate a folder, named `docs` in the root folder (if already present, add on to it) and add the following documentation in as much detail as possible:
 - README file section for each component and all the component that created or worked on in this session
 - progress report for the project, including from where we started, where we are know, and where we are heading
 - detailed summarization of the chat messages, important information, conclusions from all the question answer sessions
-- any other info related to the project should also be copied into the `knowledge` folder, which will be created in the root directory
+- any other info related to the project should also be copied into the `docs` folder, which will be created in the root directory
 - if any particular documentation is already present, then add onto it, in as much detail as possible
 ```
 
 ### **SOP-017: Knowledge Base Update**
 
 ```
-Read through the existing `knowledge` folder documentation thoroughly. Then analyze the current project state and add/update the following:
+Read through the existing `docs` folder documentation thoroughly. Then analyze the current project state and add/update the following:
 - Document any new components, files, or features added since last update
 - Update progress report with recent developments and current status
 - Add documentation for any code changes, bug fixes, or improvements
 - Update integration points and architecture changes
 - Record any new decisions, conclusions, or learnings
 - Ensure all existing documentation reflects current project state
-- Add timestamps to track documentation freshness
 ```
+
 
 ### **SOP-018: Read files without lazing around**
 
@@ -153,17 +153,17 @@ remember, read entire files thoroughly — no truncation. Always process code fr
 ### **SOP-018: Project Analysis and Code Review**
 
 ```
-I don't understand this project fully and in depth, so help me in that aspect, after analying this project, I will ask quesiton about different parts, and you will have to explain them in detail and depth, and also maintain a code review doc in knowledge, to keep track of all the questions and answer (short and summarize afterwards)
+I don't understand this project fully and in depth, so help me in that aspect, after analying this project, I will ask quesiton about different parts, and you will have to explain them in detail and depth, and also maintain a code review doc in `docs`, to keep track of all the questions and answer (short and summarize afterwards)
 
-Based on the code and our discussions, analyze the code, read through the existing `knowledge` folder documentation thoroughly in depth, and then we will go through code review
+Based on the code and our discussions, analyze the code, read through the existing `docs` folder documentation thoroughly in depth, and then we will go through code review
 ```
 
 ### **SOP-018: Project Analysis and Bug Fixing**
 
 ```
-I am current in the phase of testing this project for any bugs, while running in production. Do the below, and understand the project in as depth as depth, to know how the bug is occuring and what needs to do to fix it, and also maintain a bug report doc in knowledge, to keep track of all the bugs and their fixes (short and summarize afterwards)
+I am current in the phase of testing this project for any bugs, while running in production. Do the below, and understand the project in as depth as depth, to know how the bug is occuring and what needs to do to fix it, and also maintain a bug report doc in `docs`, to keep track of all the bugs and their fixes (short and summarize afterwards)
 
-Based on the code and our discussions, analyze the code, read through the existing `knowledge` folder documentation thoroughly in depth, and then we will go through bug fixing
+Based on the code and our discussions, analyze the code, read through the existing `docs` folder documentation thoroughly in depth, and then we will go through bug fixing
 ```
 
 ---
